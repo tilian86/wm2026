@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>WM 2026 · Deutschland</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⚽</text></svg>">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --card: #161616;
+  --card-2: #1f1f1f;
+  --txt: #f0f0f0;
+  --muted: #888;
+  --gold: #FFCE00;
+  --red: #DD0000;
+  --green: #4caf50;
+  --blue: #2196f3;
+  --orange: #ff9800;
+  --border: #2a2a2a;
+  --pitch-1: #1b5e20;
+  --pitch-2: #2e7d32;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  background: var(--bg); color: var(--txt);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+
+/* HEADER */
+.app-header {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+}
+.app-header .title { display: flex; align-items: center; gap: 10px; }
+.flag { display: inline-flex; gap: 2px; }
+.flag i { display: block; width: 16px; height: 4px; border-radius: 1px; }
+.flag i:nth-child(1) { background: #000; box-shadow: 0 0 0 1px #444; }
+.flag i:nth-child(2) { background: var(--red); }
+.flag i:nth-child(3) { background: var(--gold); }
+.app-header h1 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.app-header h1 .accent { color: var(--gold); }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 4px; margin-top: 14px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border); color: var(--muted);
+  padding: 8px 14px; border-radius: 999px; font-size: 13px;
+  font-weight: 600; cursor: pointer; white-space: nowrap;
+  font-family: inherit;
+}
+.tab.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+.content { padding: 20px 16px; max-width: 720px; margin: 0 auto; }
+.view { display: none; animation: fadeIn 0.3s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
+.lead { color: var(--muted); font-size: 14px; margin-bottom: 18px; line-height: 1.5; }
+
+/* PITCH */
+.pitch-wrap { position: relative; user-select: none; }
+.pitch-svg {
+  display: block; width: 100%; height: auto;
+  border-radius: 16px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+}
+.pos-spot {
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.pos-spot:active { transform: scale(0.95); }
+.pos-spot circle { fill: var(--gold); stroke: #000; stroke-width: 2; }
+.pos-spot text { fill: #000; font-weight: 800; font-size: 12px; text-anchor: middle; pointer-events: none; }
+.pos-spot.tw circle { fill: var(--blue); } .pos-spot.tw text { fill: white; }
+.pos-spot.def circle { fill: var(--red); } .pos-spot.def text { fill: white; }
+.pos-spot.mid circle { fill: var(--green); } .pos-spot.mid text { fill: white; }
+.pos-spot.att circle { fill: var(--orange); } .pos-spot.att text { fill: white; }
+.pos-spot:hover circle { stroke-width: 3; }
+
+.pitch-hint {
+  text-align: center; color: var(--muted); font-size: 13px;
+  margin-top: 14px;
+}
+.pitch-hint b { color: var(--gold); }
+
+.legend {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  margin-top: 14px;
+  background: var(--card); padding: 10px 14px; border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.legend span { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* MODAL */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  z-index: 100; display: none; padding: 16px;
+  align-items: flex-end; justify-content: center;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.modal-bg.show { display: flex; animation: bgIn 0.2s; }
+@keyframes bgIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--card); border-radius: 24px 24px 0 0;
+  width: 100%; max-width: 720px; max-height: 88vh;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  animation: slideUp 0.3s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@media (min-width: 720px) {
+  .modal-bg { align-items: center; }
+  .modal { border-radius: 24px; max-height: 85vh; }
+}
+.modal-handle {
+  width: 40px; height: 4px; background: #444; border-radius: 2px;
+  margin: 10px auto 6px;
+}
+.modal-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h3 { font-size: 18px; }
+.modal-close {
+  background: var(--card-2); border: 0; color: var(--txt);
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  font-size: 18px; font-family: inherit;
+}
+.modal-body { padding: 18px 20px 32px; }
+.pos-explainer {
+  background: var(--card-2); border-radius: 12px; padding: 14px 16px;
+  margin-bottom: 18px; border: 1px solid var(--border);
+}
+.pos-explainer .pos-name {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  color: var(--gold); margin-bottom: 6px;
+}
+.pos-explainer .pos-desc { font-size: 14px; line-height: 1.55; color: var(--txt); }
+.pos-explainer .pos-desc b { color: var(--gold); }
+
+/* PLAYER LIST IN MODAL */
+.player-list { display: grid; gap: 10px; }
+.player-row {
+  background: var(--card-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px; cursor: pointer;
+  display: flex; gap: 12px; align-items: center;
+}
+.player-row:active { transform: scale(0.98); }
+.player-row .ph {
+  width: 60px; height: 60px; border-radius: 50%; object-fit: cover; object-position: top;
+  background: #2a2a2a; flex-shrink: 0;
+}
+.player-row .ph-fallback {
+  width: 60px; height: 60px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 800; flex-shrink: 0;
+}
+.player-row .info { flex: 1; min-width: 0; }
+.player-row .name { font-weight: 700; font-size: 15px; }
+.player-row .meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.player-row .num {
+  background: var(--gold); color: #000; font-weight: 800;
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+
+/* PLAYER DETAIL */
+.player-detail .hero-photo {
+  position: relative;
+  background: var(--card-2);
+  margin: -18px -20px 18px;
+  height: 240px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.player-detail .hero-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  filter: brightness(0.85);
+}
+.player-detail .hero-photo .ph-fallback {
+  width: 100px; height: 100px; border-radius: 50%; font-size: 32px;
+}
+.player-detail .hero-num {
+  position: absolute; bottom: 14px; left: 16px;
+  background: var(--gold); color: #000; font-weight: 900;
+  padding: 8px 14px; border-radius: 8px; font-size: 28px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.player-detail h2 { font-size: 26px; margin-bottom: 4px; }
+.player-detail .club { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+
+.fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.fact {
+  background: var(--card-2); border-radius: 12px; padding: 12px;
+  border: 1px solid var(--border);
+}
+.fact .lbl { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.fact .val { font-size: 15px; font-weight: 700; margin-top: 4px; }
+.fact.salary { background: linear-gradient(135deg, #2a1f00, #3a2a00); border-color: var(--gold); }
+.fact.salary .val { color: var(--gold); }
+
+.merker-box {
+  background: linear-gradient(135deg, rgba(255,206,0,0.12), rgba(255,206,0,0.04));
+  border: 1px solid rgba(255,206,0,0.3);
+  border-radius: 14px; padding: 16px;
+  margin-bottom: 16px;
+}
+.merker-box .lbl { font-size: 10px; color: var(--gold); letter-spacing: 1.5px; font-weight: 800; }
+.merker-box .merker {
+  font-size: 22px; font-weight: 800; margin-top: 6px; line-height: 1.2;
+  color: var(--gold);
+}
+
+.player-section { margin-bottom: 14px; }
+.player-section .lbl {
+  font-size: 11px; font-weight: 800; color: var(--muted);
+  letter-spacing: 1.5px; margin-bottom: 4px;
+}
+.player-section p { font-size: 14px; line-height: 1.55; }
+
+.wiki-link {
+  display: block; text-align: center;
+  background: var(--card-2); border: 1px solid var(--border);
+  color: var(--gold); padding: 10px; border-radius: 10px;
+  text-decoration: none; font-weight: 600; font-size: 13px;
+  margin-top: 14px;
+}
+
+/* TOP 7 */
+.star-grid { display: grid; gap: 12px; }
+.star-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card-2) 100%);
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px; display: flex; gap: 14px; align-items: center;
+  cursor: pointer;
+}
+.star-card:active { transform: scale(0.98); }
+.star-card .ph {
+  width: 70px; height: 70px; border-radius: 50%; object-fit: cover; object-position: top;
+  background: #2a2a2a; flex-shrink: 0;
+}
+.star-card .ph-fallback {
+  width: 70px; height: 70px; border-radius: 50%; font-size: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 800; flex-shrink: 0;
+}
+.star-card .info { flex: 1; min-width: 0; }
+.star-card .name { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+.star-card .role { color: var(--gold); font-size: 12px; font-weight: 700; }
+.star-card .why { color: var(--muted); font-size: 13px; margin-top: 6px; line-height: 1.45; }
+
+/* SCHEDULE */
+.match-list { display: grid; gap: 10px; }
+.match {
+  background: var(--card); border-radius: 14px; padding: 14px;
+  border: 1px solid var(--border); display: flex; gap: 14px; align-items: center;
+}
+.match-date {
+  background: var(--card-2); padding: 8px 10px; border-radius: 10px;
+  text-align: center; min-width: 60px;
+}
+.match-date .day { font-size: 22px; font-weight: 900; color: var(--gold); line-height: 1; }
+.match-date .month { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+.match-info { flex: 1; min-width: 0; }
+.match-teams { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+.match-meta { color: var(--muted); font-size: 12px; }
+
+/* GLOSSAR */
+.glossar { display: grid; gap: 10px; }
+.term {
+  background: var(--card); border-radius: 12px; padding: 14px 16px;
+  border: 1px solid var(--border);
+}
+.term .word { font-weight: 800; color: var(--gold); font-size: 14px; margin-bottom: 4px; }
+.term .desc { font-size: 13px; line-height: 1.55; color: var(--txt); }
+
+.info-box {
+  background: linear-gradient(135deg, rgba(33,150,243,0.08), rgba(33,150,243,0.02));
+  border: 1px solid rgba(33,150,243,0.25);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;
+}
+.info-box .ttl {
+  font-size: 11px; color: var(--blue); letter-spacing: 1.5px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.info-box p { font-size: 13px; line-height: 1.55; }
+.info-box b { color: var(--blue); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="title">
+    <div class="flag"><i></i><i></i><i></i></div>
+    <h1>WM <span class="accent">2026</span> · DFB-Kader</h1>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="pitch">⚽ Spielfeld</button>
+    <button class="tab" data-view="top7">⭐ Top 7</button>
+    <button class="tab" data-view="schedule">📅 Spielplan</button>
+    <button class="tab" data-view="glossar">📖 Glossar</button>
+    <button class="tab" data-view="info">ℹ️ Infos</button>
+  </nav>
+</header>
+
+<main class="content">
+
+<!-- PITCH VIEW -->
+<div class="view active" id="pitch">
+  <h2>Tipp auf eine Position</h2>
+  <p class="lead">Jeder Punkt auf dem Feld ist eine Position. Antippen zeigt dir, welche Spieler dort spielen können – mit Bild, Verein und Gehalt.</p>
+
+  <div class="pitch-wrap">
+    <svg class="pitch-svg" viewBox="0 0 360 540" xmlns="http://www.w3.org/2000/svg">
+      <!-- Field background -->
+      <defs>
+        <linearGradient id="pitchGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1b5e20"/>
+          <stop offset="100%" stop-color="#2e7d32"/>
+        </linearGradient>
+      </defs>
+      <rect width="360" height="540" fill="url(#pitchGrad)" rx="16"/>
+      <!-- Field lines -->
+      <rect x="20" y="20" width="320" height="500" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <line x1="20" y1="270" x2="340" y2="270" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <circle cx="180" cy="270" r="50" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <circle cx="180" cy="270" r="2" fill="rgba(255,255,255,0.3)"/>
+      <!-- Penalty boxes -->
+      <rect x="100" y="20" width="160" height="60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <rect x="140" y="20" width="80" height="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <rect x="100" y="460" width="160" height="60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <rect x="140" y="500" width="80" height="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+      <!-- Position spots: 4-2-3-1 -->
+      <!-- ST (Mittelstürmer) -->
+      <g class="pos-spot att" data-pos="ST">
+        <circle cx="180" cy="90" r="26"/>
+        <text x="180" y="94">ST</text>
+      </g>
+      <!-- LF, OM, RF -->
+      <g class="pos-spot att" data-pos="LF">
+        <circle cx="70" cy="160" r="24"/>
+        <text x="70" y="164">LF</text>
+      </g>
+      <g class="pos-spot mid" data-pos="OM">
+        <circle cx="180" cy="170" r="26"/>
+        <text x="180" y="174">OM</text>
+      </g>
+      <g class="pos-spot att" data-pos="RF">
+        <circle cx="290" cy="160" r="24"/>
+        <text x="290" y="164">RF</text>
+      </g>
+      <!-- DM x 2 -->
+      <g class="pos-spot mid" data-pos="DM">
+        <circle cx="130" cy="260" r="26"/>
+        <text x="130" y="264">DM</text>
+      </g>
+      <g class="pos-spot mid" data-pos="ZM">
+        <circle cx="230" cy="260" r="26"/>
+        <text x="230" y="264">ZM</text>
+      </g>
+      <!-- LV, IV1, IV2, RV -->
+      <g class="pos-spot def" data-pos="LV">
+        <circle cx="55" cy="370" r="24"/>
+        <text x="55" y="374">LV</text>
+      </g>
+      <g class="pos-spot def" data-pos="IV">
+        <circle cx="135" cy="380" r="26"/>
+        <text x="135" y="384">IV</text>
+      </g>
+      <g class="pos-spot def" data-pos="IV">
+        <circle cx="225" cy="380" r="26"/>
+        <text x="225" y="384">IV</text>
+      </g>
+      <g class="pos-spot def" data-pos="RV">
+        <circle cx="305" cy="370" r="24"/>
+        <text x="305" y="374">RV</text>
+      </g>
+      <!-- TW -->
+      <g class="pos-spot tw" data-pos="TW">
+        <circle cx="180" cy="480" r="28"/>
+        <text x="180" y="484">TW</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--blue)"></i> Torwart</span>
+    <span><i style="background:var(--red)"></i> Verteidigung</span>
+    <span><i style="background:var(--green)"></i> Mittelfeld</span>
+    <span><i style="background:var(--orange)"></i> Angriff</span>
+  </div>
+
+  <p class="pitch-hint">Du weißt nicht, was die Abkürzungen bedeuten? Schau im <b>📖 Glossar</b> nach.</p>
+</div>
+
+<!-- TOP 7 -->
+<div class="view" id="top7">
+  <h2>Die 7 wichtigsten Namen</h2>
+  <p class="lead">Wenn du nur Zeit für 7 hast – diese hier. Antippen für Details.</p>
+  <div class="star-grid" id="top7Grid"></div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="view" id="schedule">
+  <h2>Gruppe E – Deutschlands Termine</h2>
+  <p class="lead">Drei Spiele in der Gruppenphase. Alle Zeiten in deutscher Zeit.</p>
+  <div class="match-list" id="scheduleMatches"></div>
+
+  <div class="info-box" style="margin-top: 24px;">
+    <div class="ttl">💡 WM-MODUS 2026</div>
+    <p>Erstmals <b>48 Mannschaften</b> statt 32. In jeder der 12 Gruppen gibt es 4 Teams. Die zwei Besten ziehen direkt ins Achtzehntelfinale ein, plus die 8 besten Dritten. Heißt: selbst mit einem schwachen Start kann Deutschland noch weiter.</p>
+  </div>
+</div>
+
+<!-- GLOSSAR -->
+<div class="view" id="glossar">
+  <h2>Fußball auf Deutsch</h2>
+  <p class="lead">Hier steht, was die ganzen Abkürzungen und Fachbegriffe wirklich bedeuten – ohne Angeberwissen.</p>
+
+  <div class="glossar">
+    <div class="term"><div class="word">Torwart (TW)</div><div class="desc">Der, der das Tor verteidigt. Darf als Einziger mit den Händen spielen – allerdings nur im eigenen Strafraum (das große Rechteck vor dem Tor).</div></div>
+    <div class="term"><div class="word">Innenverteidiger (IV)</div><div class="desc">Die zwei in der <b>Mitte der Abwehr</b>. Hauptjob: Stürmer stoppen, Bälle wegköpfen, ruhig bleiben. Sie sind meist groß und kopfballstark.</div></div>
+    <div class="term"><div class="word">Linksverteidiger (LV) / Rechtsverteidiger (RV)</div><div class="desc">Die <b>Außenverteidiger</b>. Verteidigen an den Seiten und laufen auch oft nach vorne, um Flanken zu schlagen. Schnell und ausdauernd.</div></div>
+    <div class="term"><div class="word">Defensives Mittelfeld (DM) / „Sechser"</div><div class="desc">Spielt <b>direkt vor der Abwehr</b>. Sammelt Bälle ein, gibt das Tempo vor, schützt die Verteidiger. „Sechser" heißt es, weil traditionell die Rückennummer 6 dort spielt.</div></div>
+    <div class="term"><div class="word">Zentrales Mittelfeld (ZM) / „Achter"</div><div class="desc">Das <b>Allround-Arbeitstier</b>. Läuft hin und her zwischen Abwehr und Angriff, hilft überall mit. „Box-to-box" nennt man das im Englischen.</div></div>
+    <div class="term"><div class="word">Offensives Mittelfeld (OM) / „Zehner"</div><div class="desc">Spielt <b>direkt hinter dem Stürmer</b>. Der Kreative, der Pässe vorbereitet, mit denen der Stürmer Tore schießen kann. Oft der Spielmacher.</div></div>
+    <div class="term"><div class="word">Linker Flügel (LF) / Rechter Flügel (RF)</div><div class="desc">Die Angreifer an den <b>Außenbahnen</b>. Schnell, dribbelstark, schlagen Flanken oder ziehen selbst nach innen, um aufs Tor zu schießen.</div></div>
+    <div class="term"><div class="word">Stürmer / Mittelstürmer (ST)</div><div class="desc">Der <b>vorderste Spieler</b>. Sein Job: Tore schießen. Steht meistens nah am gegnerischen Tor und wartet auf den entscheidenden Pass.</div></div>
+    <div class="term"><div class="word">Standardsituation („Standards")</div><div class="desc">Ein <b>ruhender Ball</b>, von dem aus gespielt wird – Eckball, Freistoß, Einwurf, Elfmeter. Hier können geübte Spieler oft Tore vorbereiten.</div></div>
+    <div class="term"><div class="word">„Pressing"</div><div class="desc">Wenn eine Mannschaft den Gegner <b>aktiv anläuft und unter Druck setzt</b>, anstatt zu warten. Anstrengend, aber effektiv.</div></div>
+    <div class="term"><div class="word">„Box-to-box"</div><div class="desc">Wörtlich: von Strafraum zu Strafraum. Beschreibt einen Spieler, der <b>überall hilft</b> – hinten verteidigt und vorne aufs Tor läuft.</div></div>
+    <div class="term"><div class="word">„Pässe zwischen die Linien"</div><div class="desc">Pässe, die <b>durch die Lücken zwischen Abwehr und Mittelfeld</b> des Gegners gespielt werden. Schwer zu spielen, gefährlich wenn's klappt.</div></div>
+    <div class="term"><div class="word">4-2-3-1</div><div class="desc">Die <b>Grundordnung</b> der Spieler auf dem Platz. Bedeutet: 4 Verteidiger, 2 defensive Mittelfeldspieler, 3 offensive, 1 Stürmer. So spielt Deutschland meistens.</div></div>
+    <div class="term"><div class="word">Achtzehntelfinale / Runde der 32</div><div class="desc">Erste K.-o.-Runde der WM 2026 (neu wegen 48 Teams). Wer hier verliert, fliegt raus. Heißt: 16 Spiele, 16 Verlierer.</div></div>
+  </div>
+</div>
+
+<!-- INFOS -->
+<div class="view" id="info">
+  <h2>Trainer & Kapitän</h2>
+  <p class="lead">Die zwei wichtigsten Persönlichkeiten neben dem Spielfeld.</p>
+
+  <div class="star-grid" style="margin-bottom: 30px;">
+    <div class="star-card" data-coach="nagelsmann">
+      <div class="ph-fallback">JN</div>
+      <div class="info">
+        <div class="name">Julian Nagelsmann</div>
+        <div class="role">BUNDESTRAINER · 38 Jahre</div>
+        <div class="why">Jüngster Trainer der ganzen WM. Taktik-Tüftler. Erste WM in dieser Rolle. Vertrag bis 2026.</div>
+      </div>
+    </div>
+    <div class="star-card" onclick="openPlayerDetail(6)">
+      <div class="ph-fallback">JK</div>
+      <div class="info">
+        <div class="name">Joshua Kimmich</div>
+        <div class="role">KAPITÄN · 30 Jahre · 3. WM</div>
+        <div class="why">FC Bayern. Spielmacher und Lautsprecher. Standardspezialist. Wenn die Mannschaft Ordnung braucht – er ruft.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Über diese App</h2>
+  <p class="lead">Lernhilfe für den DFB-Kader bei der Fußball-WM 2026 in den USA, Kanada und Mexiko.</p>
+
+  <div class="info-box">
+    <div class="ttl">📸 BILDER</div>
+    <p>Spielerfotos werden von Wikipedia geladen, sobald du eine Karte öffnest. Falls jemand kein Bild auf Wikipedia hat, gibt's ein Initialen-Avatar.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="ttl">💰 GEHÄLTER</div>
+    <p>Schätzungen von Capology, brutto pro Jahr. Ohne Werbe-Verträge, Boni und Prämien – die echten Beträge können deutlich höher sein.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="ttl">📋 KADER-STAND</div>
+    <p>DFB-Rückennummern vom 02.06.2026. Assan Ouédraogo wurde nachnominiert für den verletzten Lennart Karl.</p>
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL: Position → Player List -->
+<div class="modal-bg" id="modalPos" onclick="if(event.target===this) closeModal('modalPos')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 id="modalPosTitle">Position</h3>
+      <button class="modal-close" onclick="closeModal('modalPos')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="pos-explainer">
+        <div class="pos-name" id="modalPosName"></div>
+        <div class="pos-desc" id="modalPosDesc"></div>
+      </div>
+      <div class="player-list" id="modalPosList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Player Detail -->
+<div class="modal-bg" id="modalPlayer" onclick="if(event.target===this) closeModal('modalPlayer')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 id="modalPlayerTitle">Spieler</h3>
+      <button class="modal-close" onclick="closeModal('modalPlayer')">✕</button>
+    </div>
+    <div class="modal-body player-detail" id="modalPlayerBody"></div>
+  </div>
+</div>
+
+<!-- MODAL: Coach -->
+<div class="modal-bg" id="modalCoach" onclick="if(event.target===this) closeModal('modalCoach')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3>Julian Nagelsmann</h3>
+      <button class="modal-close" onclick="closeModal('modalCoach')">✕</button>
+    </div>
+    <div class="modal-body player-detail" id="modalCoachBody"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const PLAYERS = [
+  { nr:1, name:"Manuel Neuer", wiki:"Manuel_Neuer", initials:"MN", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["TW"], positionDetail:"Torwart", age:40, salary:"21,00 Mio. €", contract:"2027", profile:"Mitspielender Torwart, riesige Erfahrung, Kommandos und Risiko im Aufbau.", role:"Nummer 1 und Symbolfigur. Wenn er weit vor dem Tor steht: meistens Absicht.", merker:"Torwart-Libero", achte:"Auf seine Stellung außerhalb des Strafraums" },
+  { nr:2, name:"Antonio Rüdiger", wiki:"Antonio_Rüdiger", initials:"AR", club:"Real Madrid", clubFlag:"🇪🇸", pos:["IV"], positionDetail:"Innenverteidiger", age:32, salary:"14,58 Mio. €", contract:"2027", profile:"Körper, Tempo, Zweikampf, Emotion. Einer der unangenehmsten Verteidiger.", role:"Abwehrchef, wenn es hektisch wird.", merker:"Der Security-Mann", achte:"Wie früh er attackiert und Gegner einschüchtert" },
+  { nr:3, name:"Waldemar Anton", wiki:"Waldemar_Anton", initials:"WA", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["IV"], positionDetail:"Innenverteidiger", age:29, salary:"5,28 Mio. €", contract:"2028", profile:"Solide, nüchtern, wenig Show. Gut als Absicherung im Zentrum.", role:"Rotationsspieler für Stabilität.", merker:"Die Versicherungspolice", achte:"Sauberes Stellungsspiel statt Spektakel" },
+  { nr:4, name:"Jonathan Tah", wiki:"Jonathan_Tah", initials:"JT", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["IV"], positionDetail:"Innenverteidiger", age:29, salary:"12,00 Mio. €", contract:"2029", profile:"Ruhe, Physis, Kopfball, gute Positionierung.", role:"Soll Abwehr kontrollieren, nicht wild machen.", merker:"Die ruhige Wand", achte:"Wie er ohne Grätsche Räume schließt" },
+  { nr:5, name:"Aleksandar Pavlović", wiki:"Aleksandar_Pavlović", initials:"AP", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["DM"], positionDetail:"Defensives Mittelfeld", age:21, salary:"5,66 Mio. €", contract:"2029", profile:"Ruhiger Ballverteiler, pressingresistent, gutes Timing.", role:"Ordnungsspieler vor der Abwehr.", merker:"Leiser Dirigent", achte:"Den unspektakulären, richtigen Pass" },
+  { nr:6, name:"Joshua Kimmich", wiki:"Joshua_Kimmich", initials:"JK", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["RV","DM"], positionDetail:"Rechtsverteidiger / Sechser · KAPITÄN", age:30, salary:"20,00 Mio. €", contract:"2029", profile:"Kapitän, Struktur, Standards, Ehrgeiz. Hinten rechts oder zentral.", role:"Taktischer Chef. Ordnet, zeigt, diskutiert.", merker:"Lehrer, Controller und Kapitän", achte:"Standards, Seitenwechsel, Körpersprache" },
+  { nr:7, name:"Kai Havertz", wiki:"Kai_Havertz", initials:"KH", club:"FC Arsenal", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["ST"], positionDetail:"Stürmer / hängende Spitze", age:26, salary:"14,56 Mio. £", contract:"2028", profile:"Technik, Räume öffnen, Verbindung zwischen Mittelfeld und Sturm.", role:"Kein klassischer Strafraumtank, eher intelligenter Verknüpfer.", merker:"Stürmer, der wie ein Spielmacher denkt", achte:"Wie er Verteidiger wegzieht" },
+  { nr:8, name:"Leon Goretzka", wiki:"Leon_Goretzka", initials:"LG", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["ZM"], positionDetail:"Zentrales Mittelfeld", age:30, salary:"13,00 Mio. €", contract:"2026", profile:"Körper, Laufstärke, Präsenz im Strafraum.", role:"Box-to-box: hinten helfen, vorne auftauchen.", merker:"Achter mit Gym-Mitgliedschaft", achte:"Späte Läufe in den Strafraum" },
+  { nr:9, name:"Jamie Leweling", wiki:"Jamie_Leweling", initials:"JL", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["RF","LF"], positionDetail:"Rechter Flügel", age:24, salary:"3,21 Mio. €", contract:"2029", profile:"Tempo, direkte Läufe, Tiefe.", role:"Kann Spiele öffnen, wenn Räume da sind.", merker:"Gerade Linie Richtung Tor", achte:"Startet oft in den Rücken der Abwehr" },
+  { nr:10, name:"Jamal Musiala", wiki:"Jamal_Musiala", initials:"JM", club:"FC Bayern München", clubFlag:"🇩🇪", pos:["OM","RF"], positionDetail:"Offensives Mittelfeld", age:22, salary:"20,75 Mio. €", contract:"2030", profile:"Dribbling auf engem Raum, Wendigkeit, Eins-gegen-eins.", role:"Unterschiedsspieler, wenn ein Spiel festhängt.", merker:"Bambi im Slalom", achte:"Wenn er zwischen Mittelfeld und Abwehr den Ball bekommt" },
+  { nr:11, name:"Nick Woltemade", wiki:"Nick_Woltemade", initials:"NW", club:"Newcastle United", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["ST"], positionDetail:"Mittelstürmer", age:23, salary:"6,89 Mio. £", contract:"2031", profile:"Sehr groß, technisch sauber, Bälle festmachen.", role:"Zielspieler und Wandspieler.", merker:"Langer Stürmer, aber nicht nur Kopfballstange", achte:"Er lässt Bälle prallen und bindet Verteidiger" },
+  { nr:12, name:"Oliver Baumann", wiki:"Oliver_Baumann", initials:"OB", club:"TSG Hoffenheim", clubFlag:"🇩🇪", pos:["TW"], positionDetail:"Torwart", age:35, salary:"3,58 Mio. €", contract:"2028", profile:"Konstant, ruhig, Bundesliga-erfahren.", role:"Zuverlässige Nummer 2/3, kein Showtorwart.", merker:"Ruhiger Versicherungsvertreter im Tor", achte:"Saubere Reflexe, wenig Theater" },
+  { nr:13, name:"Pascal Groß", wiki:"Pascal_Groß", initials:"PG", club:"Brighton & Hove Albion", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["ZM","RV","DM"], positionDetail:"Zentrales Mittelfeld / Rechtsverteidiger", age:34, salary:"4,68 Mio. £", contract:"2027", profile:"Spielintelligenz, Standards, Erfahrung, Positionsflexibilität.", role:"Der clevere Werkzeugspieler.", merker:"Schachspieler mit Fußballschuhen", achte:"Standards und kluge Pässe ohne Hektik" },
+  { nr:14, name:"Maximilian Beier", wiki:"Maximilian_Beier", initials:"MB", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["ST","RF","LF"], positionDetail:"Stürmer / Flügel", age:23, salary:"4,15 Mio. €", contract:"2029", profile:"Schnell, flexibel, sucht Tiefe hinter der Abwehr.", role:"Joker oder Startoption für mehr Tempo.", merker:"Rennt dahin, wo der Ball gleich hinkommt", achte:"Läufe hinter die Kette" },
+  { nr:15, name:"Nico Schlotterbeck", wiki:"Nico_Schlotterbeck", initials:"NS", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["IV"], positionDetail:"Innenverteidiger", age:26, salary:"4,72 Mio. €", contract:"2031", profile:"Linker Fuß, mutige Pässe, Aufbau von hinten.", role:"Kann Angriffe schon aus der Abwehr starten.", merker:"Innenverteidiger mit Spielmacher-Anwandlung", achte:"Lange Pässe und riskantere Aufbauaktionen" },
+  { nr:16, name:"Angelo Stiller", wiki:"Angelo_Stiller", initials:"AS", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["DM","ZM"], positionDetail:"Defensives / zentrales Mittelfeld", age:24, salary:"4,53 Mio. €", contract:"2028", profile:"Rhythmus, Balance, Spielkontrolle.", role:"Hält das Mittelfeld sortiert.", merker:"Metronomspieler", achte:"Wie oft er das Tempo beruhigt oder anzieht" },
+  { nr:17, name:"Florian Wirtz", wiki:"Florian_Wirtz", initials:"FW", club:"FC Liverpool", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["OM"], positionDetail:"Offensives Mittelfeld", age:22, salary:"10,40 Mio. £", contract:"2030", profile:"Kreativität, letzter Pass, Raumgefühl.", role:"Kreativzentrum neben Musiala.", merker:"Sieht Lücken, bevor sie existieren", achte:"Pässe zwischen die Linien und Doppelpässe" },
+  { nr:18, name:"Nathaniel Brown", wiki:"Nathaniel_Brown_(Fußballspieler)", initials:"NB", club:"Eintracht Frankfurt", clubFlag:"🇩🇪", pos:["LV"], positionDetail:"Linksverteidiger", age:22, salary:"2,26 Mio. €", contract:"2030", profile:"Dynamisch, jung, linke Seite, viel Laufleistung.", role:"Neue Option links, mögliches Turniergesicht.", merker:"Der neue linke Pfeil", achte:"Wie mutig er nach vorne geht" },
+  { nr:19, name:"Leroy Sané", wiki:"Leroy_Sané", initials:"LS", club:"Galatasaray Istanbul", clubFlag:"🇹🇷", pos:["LF","RF"], positionDetail:"Flügel", age:30, salary:"11,25 Mio. €", contract:"2028", profile:"Tempo, linker Fuß, Dribbling, Abschluss. Tagesformspieler.", role:"Kann Spiele alleine öffnen.", merker:"Turbo mit Tagesform", achte:"Wenn er von rechts nach innen zieht" },
+  { nr:20, name:"Nadiem Amiri", wiki:"Nadiem_Amiri", initials:"NA", club:"1. FSV Mainz 05", clubFlag:"🇩🇪", pos:["ZM","OM"], positionDetail:"Zentrales / offensives Mittelfeld", age:29, salary:"2,83 Mio. €", contract:"2028", profile:"Technik, Standards, Energie, Spielwitz.", role:"Kreativer Rotationsspieler.", merker:"Mainzer Werkzeugkasten", achte:"Freistöße, Ecken, schnelle Kombinationen" },
+  { nr:21, name:"Alexander Nübel", wiki:"Alexander_Nübel", initials:"AN", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["TW"], positionDetail:"Torwart", age:29, salary:"4,15 Mio. €", contract:"2026", profile:"Moderner Torwart, stark mit Ball am Fuß, gute Reichweite.", role:"Backup mit Neuer-Schule.", merker:"Neuer-Schüler aus Stuttgart", achte:"Wie ruhig er mit Rückpässen umgeht" },
+  { nr:22, name:"David Raum", wiki:"David_Raum", initials:"DR", club:"RB Leipzig", clubFlag:"🇩🇪", pos:["LV"], positionDetail:"Linksverteidiger", age:28, salary:"7,55 Mio. €", contract:"2027", profile:"Flanken, Standards, Energie, linke Breite.", role:"Offensiver Außenverteidiger, macht die Seite auf.", merker:"Außenverteidiger mit Lautsprecher", achte:"Flanken und Standards von links" },
+  { nr:23, name:"Felix Nmecha", wiki:"Felix_Nmecha", initials:"FN", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["ZM"], positionDetail:"Zentrales Mittelfeld", age:25, salary:"8,02 Mio. €", contract:"2030", profile:"Groß, dynamisch, robust, vertikale Läufe.", role:"Körperliche Mittelfeldoption.", merker:"Langer Achter mit Wucht", achte:"Wenn Deutschland mehr Physis braucht" },
+  { nr:24, name:"Malick Thiaw", wiki:"Malick_Thiaw", initials:"MT", club:"Newcastle United", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["IV"], positionDetail:"Innenverteidiger", age:24, salary:"3,90 Mio. £", contract:"2026", profile:"Athletik, Zweikampf, Premier-League-Härte.", role:"Körperliche Alternative in der Innenverteidigung.", merker:"Premier-League-Körper", achte:"Direkte Duelle und Kopfballduelle" },
+  { nr:25, name:"Assan Ouédraogo", wiki:"Assan_Ouédraogo", initials:"AO", club:"RB Leipzig", clubFlag:"🇩🇪", pos:["ZM","OM"], positionDetail:"Zentrales / offensives Mittelfeld", age:20, salary:"1,32 Mio. €", contract:"2029", profile:"Dribbling, Dynamik, Mut, U17-Weltmeister. Nachrücker für Lennart Karl.", role:"Wildcard, Energie- und Talentoption.", merker:"Aus dem Urlaub in den WM-Kader", achte:"Unbeschwerte Dribblings und vertikale Aktionen" },
+  { nr:26, name:"Deniz Undav", wiki:"Deniz_Undav", initials:"DU", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["ST"], positionDetail:"Mittelstürmer", age:29, salary:"4,53 Mio. €", contract:"2029", profile:"Abschluss, Strafraumgefühl, Emotionalität, Direktheit.", role:"Stürmer, wenn Deutschland Zielstrebigkeit braucht.", merker:"Der, der einfach mal abschließt", achte:"Sucht schneller den Schuss als Havertz" }
+];
+
+const POSITIONS = {
+  TW: { name: "Torwart", desc: "Verteidigt das Tor. Darf als Einziger mit den <b>Händen spielen</b> – aber nur im eigenen Strafraum. Bei modernen Torhütern auch wichtig: gut Fußball spielen können, weil sie oft den Angriff einleiten." },
+  IV: { name: "Innenverteidigung", desc: "Die zwei in der <b>Mitte der Abwehr</b>. Hauptjob: Stürmer stoppen, Bälle wegköpfen, ruhig bleiben. Bei Deutschland spielen zwei zur gleichen Zeit." },
+  LV: { name: "Linksverteidiger", desc: "Verteidigt an der <b>linken Außenbahn</b>. Läuft auch oft nach vorne, schlägt Flanken zum Stürmer. Muss schnell und ausdauernd sein." },
+  RV: { name: "Rechtsverteidiger", desc: "Verteidigt an der <b>rechten Außenbahn</b>. Wie der LV, nur auf der anderen Seite. Kimmich macht das oft – läuft aber auch ins Mittelfeld zurück." },
+  DM: { name: "Defensives Mittelfeld („Sechser\")", desc: "Spielt <b>direkt vor der Abwehr</b>. Sammelt Bälle ein, leitet Angriffe ein, schützt die Verteidiger. Heißt „Sechser\", weil traditionell die Rückennummer 6 dort gespielt hat." },
+  ZM: { name: "Zentrales Mittelfeld („Achter\")", desc: "Das <b>Arbeitstier</b> – läuft die ganze Zeit zwischen Abwehr und Angriff hin und her. Hilft überall, wo Hilfe gebraucht wird." },
+  OM: { name: "Offensives Mittelfeld („Zehner\")", desc: "Spielt <b>hinter dem Stürmer</b>. Der Kreative im Team, der den entscheidenden letzten Pass zum Stürmer macht. Heißt „Zehner\", weil traditionell die Nummer 10 dort spielt." },
+  LF: { name: "Linker Flügel", desc: "Der Angreifer auf der <b>linken Außenbahn</b>. Schnell, dribbelstark. Schlägt Flanken oder zieht selbst nach innen, um aufs Tor zu schießen." },
+  RF: { name: "Rechter Flügel", desc: "Der Angreifer auf der <b>rechten Außenbahn</b>. Wie der LF, nur auf der anderen Seite." },
+  ST: { name: "Mittelstürmer", desc: "Der <b>vorderste Spieler</b>. Sein Hauptjob: <b>Tore schießen</b>. Steht meistens nah am gegnerischen Tor und wartet auf den entscheidenden Pass." }
+};
+
+const TOP7_DATA = [
+  { nr: 1, role: "Torwart-Libero", why: "Erfahrung, riesige Turnierfigur. Wenn er weit vor dem Tor steht: meistens Absicht." },
+  { nr: 6, role: "Chefmodus · Kapitän", why: "Ordnet das Team, ist Standardspezialist. Wenn die Mannschaft Hilfe braucht – er ruft." },
+  { nr: 2, role: "Security", why: "Härte, Tempo, Mentalität in der Abwehr. Real-Madrid-Star." },
+  { nr: 17, role: "Lückenseher", why: "Kreativzentrum. Sieht Lücken, bevor sie offiziell existieren." },
+  { nr: 10, role: "Slalom", why: "Dribbling in engen Räumen. Unterschiedsspieler, wenn ein Spiel festhängt." },
+  { nr: 7, role: "Spielmacher-Stürmer", why: "Verbindet Sturm und Mittelfeld. Eher klug als brutal." },
+  { nr: 19, role: "Turbo mit Tagesform", why: "Tempo, linker Fuß. Kann Spiele alleine öffnen – oder abtauchen." }
+];
+
+const MATCHES = [
+  { day: 14, month: "Juni", weekday: "Sonntag", opponent: "Curaçao", flag: "🇨🇼", time: "19:00", city: "Houston, USA" },
+  { day: 20, month: "Juni", weekday: "Samstag", opponent: "Elfenbeinküste", flag: "🇨🇮", time: "22:00", city: "Toronto, Kanada" },
+  { day: 25, month: "Juni", weekday: "Donnerstag", opponent: "Ecuador", flag: "🇪🇨", time: "22:00", city: "New York / NJ, USA" }
+];
+
+const COACH = {
+  name: "Julian Nagelsmann",
+  wiki: "Julian_Nagelsmann",
+  initials: "JN",
+  role: "Bundestrainer",
+  age: 38,
+  contract: "2026",
+  facts: [
+    { lbl: "Geboren", val: "1987 in Landsberg am Lech" },
+    { lbl: "Vorher Trainer", val: "Hoffenheim, RB Leipzig, FC Bayern" },
+    { lbl: "Spitzname", val: "Mini-Mourinho" },
+    { lbl: "Stil", val: "Detailbesessen, taktikverliebt" }
+  ],
+  story: "Mit 38 der <b>jüngste Trainer</b> bei der ganzen Weltmeisterschaft. Wurde mit 28 jüngster Bundesliga-Trainer aller Zeiten (Hoffenheim 2016). Übernahm den DFB nach der enttäuschenden Heim-EM-Vorrunde 2024 mitten in der Krise. Seine erste WM als Bundestrainer.",
+  philosophy: "Setzt auf <b>aggressives Pressing</b> (Gegner früh stören) und schnelles Umschaltspiel. Bekannt für sehr detaillierte Spielanalysen – wechselt manchmal mehrmals während eines Spiels die Taktik."
+};
+
+// ============================================================
+// WIKIPEDIA PHOTO LOADER
+// ============================================================
+const photoCache = {};
+async function getPhoto(wikiSlug) {
+  if (photoCache[wikiSlug] !== undefined) return photoCache[wikiSlug];
+  try {
+    const r = await fetch(`https://de.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiSlug)}`);
+    if (!r.ok) throw new Error('not ok');
+    const data = await r.json();
+    const url = data.thumbnail?.source || data.originalimage?.source || null;
+    // For more detail, request bigger thumbnail
+    let bigUrl = url;
+    if (url && data.thumbnail?.source && data.originalimage?.source) {
+      bigUrl = data.originalimage.source;
+    }
+    photoCache[wikiSlug] = bigUrl;
+    return bigUrl;
+  } catch (e) {
+    photoCache[wikiSlug] = null;
+    return null;
+  }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ============================================================
+// PITCH CLICKS
+// ============================================================
+document.querySelectorAll('.pos-spot').forEach(spot => {
+  spot.addEventListener('click', () => openPositionModal(spot.dataset.pos));
+});
+
+async function openPositionModal(pos) {
+  const data = POSITIONS[pos];
+  document.getElementById('modalPosTitle').textContent = data.name;
+  document.getElementById('modalPosName').textContent = data.name.toUpperCase();
+  document.getElementById('modalPosDesc').innerHTML = data.desc;
+  const players = PLAYERS.filter(p => p.pos.includes(pos));
+  const list = document.getElementById('modalPosList');
+  list.innerHTML = players.map(p => `
+    <div class="player-row" onclick="closeModal('modalPos'); openPlayerDetail(${p.nr})">
+      <div class="ph-fallback" id="ph-list-${p.nr}">${p.initials}</div>
+      <div class="info">
+        <div class="name">${p.name}</div>
+        <div class="meta">${p.club} · ${p.age} J.</div>
+      </div>
+      <div class="num">${p.nr}</div>
+    </div>
+  `).join('');
+  openModal('modalPos');
+  // Load photos
+  for (const p of players) {
+    const url = await getPhoto(p.wiki);
+    if (url) {
+      const el = document.getElementById(`ph-list-${p.nr}`);
+      if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
+    }
+  }
+}
+
+async function openPlayerDetail(nr) {
+  const p = PLAYERS.find(x => x.nr === nr);
+  if (!p) return;
+  document.getElementById('modalPlayerTitle').textContent = p.name;
+  const body = document.getElementById('modalPlayerBody');
+  body.innerHTML = `
+    <div class="hero-photo">
+      <div class="ph-fallback">${p.initials}</div>
+      <div class="hero-num">#${p.nr}</div>
+    </div>
+    <h2>${p.name}</h2>
+    <div class="club">${p.club} ${p.clubFlag}</div>
+
+    <div class="fact-grid">
+      <div class="fact"><div class="lbl">Position</div><div class="val">${p.positionDetail}</div></div>
+      <div class="fact"><div class="lbl">Alter</div><div class="val">${p.age} Jahre</div></div>
+      <div class="fact"><div class="lbl">Vertrag bis</div><div class="val">${p.contract}</div></div>
+      <div class="fact salary"><div class="lbl">Gehalt brutto/Jahr</div><div class="val">${p.salary}</div></div>
+    </div>
+
+    <div class="merker-box">
+      <div class="lbl">⭐ MERKE DIR</div>
+      <div class="merker">„${p.merker}"</div>
+    </div>
+
+    <div class="player-section">
+      <div class="lbl">PROFIL</div>
+      <p>${p.profile}</p>
+    </div>
+    <div class="player-section">
+      <div class="lbl">ROLLE IM TEAM</div>
+      <p>${p.role}</p>
+    </div>
+    <div class="player-section">
+      <div class="lbl">ACHTE IM SPIEL AUF</div>
+      <p>${p.achte}.</p>
+    </div>
+
+    <a href="https://de.wikipedia.org/wiki/${encodeURIComponent(p.wiki)}" target="_blank" class="wiki-link">📖 Mehr auf Wikipedia</a>
+  `;
+  openModal('modalPlayer');
+  // Load photo
+  const url = await getPhoto(p.wiki);
+  if (url) {
+    const heroPhoto = body.querySelector('.hero-photo');
+    heroPhoto.innerHTML = `<img src="${url}" alt="${p.name}"><div class="hero-num">#${p.nr}</div>`;
+  }
+}
+
+// ============================================================
+// COACH MODAL
+// ============================================================
+document.querySelectorAll('[data-coach]').forEach(el => {
+  el.addEventListener('click', () => openCoachModal());
+});
+
+async function openCoachModal() {
+  const c = COACH;
+  const body = document.getElementById('modalCoachBody');
+  body.innerHTML = `
+    <div class="hero-photo">
+      <div class="ph-fallback">${c.initials}</div>
+    </div>
+    <h2>${c.name}</h2>
+    <div class="club">${c.role} · ${c.age} Jahre · Vertrag bis ${c.contract}</div>
+
+    <div class="fact-grid">
+      ${c.facts.map(f => `<div class="fact"><div class="lbl">${f.lbl}</div><div class="val">${f.val}</div></div>`).join('')}
+    </div>
+
+    <div class="player-section">
+      <div class="lbl">DIE STORY</div>
+      <p>${c.story}</p>
+    </div>
+    <div class="player-section">
+      <div class="lbl">SEIN STIL</div>
+      <p>${c.philosophy}</p>
+    </div>
+
+    <a href="https://de.wikipedia.org/wiki/${encodeURIComponent(c.wiki)}" target="_blank" class="wiki-link">📖 Mehr auf Wikipedia</a>
+  `;
+  openModal('modalCoach');
+  // Photo
+  const url = await getPhoto(c.wiki);
+  if (url) {
+    const heroPhoto = body.querySelector('.hero-photo');
+    heroPhoto.innerHTML = `<img src="${url}" alt="${c.name}">`;
+  }
+}
+
+// ============================================================
+// MODAL UTILS
+// ============================================================
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ============================================================
+// RENDER TOP 7
+// ============================================================
+function renderTop7() {
+  const html = TOP7_DATA.map(t => {
+    const p = PLAYERS.find(x => x.nr === t.nr);
+    return `
+      <div class="star-card" onclick="openPlayerDetail(${p.nr})">
+        <div class="ph-fallback" id="top7-${p.nr}">${p.initials}</div>
+        <div class="info">
+          <div class="name">${p.name}</div>
+          <div class="role">${t.role}</div>
+          <div class="why">${t.why}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('top7Grid').innerHTML = html;
+  // Load top7 photos
+  TOP7_DATA.forEach(async t => {
+    const p = PLAYERS.find(x => x.nr === t.nr);
+    const url = await getPhoto(p.wiki);
+    if (url) {
+      const el = document.getElementById(`top7-${p.nr}`);
+      if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
+    }
+  });
+}
+
+function renderSchedule() {
+  document.getElementById('scheduleMatches').innerHTML = MATCHES.map(m => `
+    <div class="match">
+      <div class="match-date"><div class="day">${m.day}</div><div class="month">${m.month}</div></div>
+      <div class="match-info">
+        <div class="match-teams">🇩🇪 Deutschland vs. ${m.opponent} ${m.flag}</div>
+        <div class="match-meta">${m.weekday} · ${m.time} Uhr (MESZ) · ${m.city}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderTop7();
+renderSchedule();
+</script>
+
+</body>
+</html>
