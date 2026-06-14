@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DFB WM 2026">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
 :root {
   --bg: #0a0a0a;
@@ -887,6 +888,138 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   color: var(--muted);
   font-weight: 500;
 }
+
+/* NEWS */
+.news-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.news-card .badge {
+  display: inline-block;
+  background: var(--gold); color: #000;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+.news-card .badge.pre { background: var(--blue); color: white; }
+.news-card .badge.post { background: var(--green); color: white; }
+.news-card .badge.live { background: var(--red); color: white; animation: blinkBg 1s infinite; }
+@keyframes blinkBg { 50% { opacity: 0.5; } }
+.news-card h3 {
+  font-size: 19px; line-height: 1.25; margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.news-card .date { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.news-card p { font-size: 14px; line-height: 1.55; margin-bottom: 10px; }
+.news-card p b { color: var(--gold); }
+.news-card ul { font-size: 14px; line-height: 1.6; padding-left: 20px; margin-bottom: 10px; }
+.news-card .news-actions { margin-top: 12px; }
+
+/* DUEL */
+.duel-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  margin-bottom: 16px;
+}
+.duel-stats > div {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px;
+  text-align: center;
+}
+.duel-stats .lbl { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.duel-stats .val { display: block; font-size: 22px; font-weight: 900; color: var(--gold); margin-top: 4px; }
+
+.duel-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px;
+}
+.duel-q {
+  text-align: center; font-size: 19px; font-weight: 800;
+  margin-bottom: 18px; letter-spacing: -0.3px; line-height: 1.3;
+}
+.duel-q b { color: var(--gold); }
+.duel-pair {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  align-items: stretch;
+}
+.duel-option {
+  background: var(--card-2); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px 10px;
+  cursor: pointer; text-align: center;
+  transition: all 0.2s;
+}
+.duel-option:active { transform: scale(0.97); }
+.duel-option .ph {
+  width: 80px; height: 80px; border-radius: 50%;
+  object-fit: cover; object-position: center 15%;
+  margin: 0 auto 10px; background: var(--card);
+  display: block;
+}
+.duel-option .ph-fallback {
+  width: 80px; height: 80px; border-radius: 50%;
+  margin: 0 auto 10px;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 800; font-size: 24px;
+  display: flex; align-items: center; justify-content: center;
+}
+.duel-option .name { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.duel-option .meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.duel-option.right { border-color: var(--green); background: rgba(76,175,80,0.15); }
+.duel-option.wrong { border-color: var(--red); background: rgba(221,0,0,0.15); }
+.duel-option .answer {
+  font-size: 13px; font-weight: 800; margin-top: 8px;
+  display: none;
+}
+.duel-option.right .answer, .duel-option.wrong .answer { display: block; }
+.duel-option.right .answer { color: var(--green); }
+.duel-option.wrong .answer { color: var(--red); }
+.duel-vs {
+  text-align: center; font-size: 22px; font-weight: 900;
+  color: var(--gold); margin: 12px 0;
+}
+.duel-feedback {
+  margin-top: 14px; text-align: center;
+  font-size: 13px; min-height: 18px; color: var(--muted);
+}
+.duel-feedback.right { color: var(--green); font-weight: 700; }
+.duel-feedback.wrong { color: var(--red); font-weight: 700; }
+
+/* MAP */
+#mapEl .leaflet-popup-content {
+  margin: 10px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+#mapEl .leaflet-popup-content b { color: #000; font-size: 13px; }
+#mapEl .leaflet-popup-content ul { margin: 6px 0 0; padding-left: 18px; font-size: 12px; }
+#mapEl .leaflet-popup-content li { margin-bottom: 2px; }
+.club-pin {
+  background: var(--gold);
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 50%;
+  width: 32px !important; height: 32px !important;
+  text-align: center;
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.club-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.club-tile {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+}
+.club-tile .name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.club-tile .flag { font-size: 14px; margin-right: 4px; }
+.club-tile .count {
+  display: inline-block; background: var(--gold); color: #000;
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.club-tile .players { font-size: 11px; color: var(--muted); line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -897,12 +1030,15 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <h1>WM <span class="accent">2026</span> · DFB-Kader</h1>
   </div>
   <nav class="tabs">
+    <button class="tab active" data-view="news">📰 News</button>
     <button class="tab" data-view="live">🔴 Live</button>
-    <button class="tab active" data-view="pitch">⚽ Spielfeld</button>
+    <button class="tab" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 Spielplan</button>
     <button class="tab" data-view="stats">📊 Stats</button>
     <button class="tab" data-view="trivia">🎉 Trivia</button>
+    <button class="tab" data-view="duel">🎲 Duell</button>
+    <button class="tab" data-view="map">🗺️ Karte</button>
     <button class="tab" data-view="glossar">📖 Glossar</button>
     <button class="tab" data-view="info">ℹ️ Infos</button>
   </nav>
@@ -921,6 +1057,33 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 </div>
 
 <main class="content">
+
+<!-- NEWS VIEW -->
+<div class="view active" id="news">
+  <h2>📰 Was du wissen musst</h2>
+  <p class="lead">Schnellüberblick für alle, die nicht jeden Tag Fußballnachrichten lesen. Aktualisiert vor und nach jedem Spiel.</p>
+  <div id="newsList"></div>
+</div>
+
+<!-- DUEL VIEW -->
+<div class="view" id="duel">
+  <h2>🎲 Duell der Spieler</h2>
+  <p class="lead">Zwei Spieler – eine Frage. Tipp den, von dem du denkst, dass die Antwort stimmt. Lerne dabei spielerisch.</p>
+  <div class="duel-stats">
+    <div><span class="lbl">Richtig</span><span class="val" id="duelRight">0</span></div>
+    <div><span class="lbl">Gespielt</span><span class="val" id="duelTotal">0</span></div>
+    <div><span class="lbl">Streak</span><span class="val" id="duelStreak">0</span></div>
+  </div>
+  <div class="duel-card" id="duelCard"></div>
+</div>
+
+<!-- MAP VIEW -->
+<div class="view" id="map">
+  <h2>🗺️ Wo spielen sie?</h2>
+  <p class="lead">Karte aller Vereine, bei denen die DFB-Spieler im Alltag kicken. Tippe auf einen Punkt für die Spieler-Liste.</p>
+  <div id="mapEl" style="height: 480px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--card);"></div>
+  <div class="club-grid" id="clubGrid" style="margin-top: 18px;"></div>
+</div>
 
 <!-- LIVE VIEW -->
 <div class="view" id="live">
@@ -977,7 +1140,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 </div>
 
 <!-- PITCH VIEW -->
-<div class="view active" id="pitch">
+<div class="view" id="pitch">
   <h2>Tipp auf eine Position</h2>
   <p class="lead">Jeder Punkt auf dem Feld ist eine Position. Antippen zeigt dir, welche Spieler dort spielen können – mit Bild, Verein und Gehalt.</p>
 
@@ -1283,14 +1446,14 @@ const PLAYERS = [
   { nr:15, name:"Nico Schlotterbeck", wiki:"Nico_Schlotterbeck", initials:"NS", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["IV"], positionDetail:"Innenverteidiger", age:26, salary:"4,72 Mio. €", contract:"2031", profile:"Linker Fuß, mutige Pässe, Aufbau von hinten.", role:"Kann Angriffe schon aus der Abwehr starten.", merker:"Innenverteidiger mit Spielmacher-Anwandlung", achte:"Lange Pässe und riskantere Aufbauaktionen" },
   { nr:16, name:"Angelo Stiller", wiki:"Angelo_Stiller", initials:"AS", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["DM","ZM"], positionDetail:"Defensives / zentrales Mittelfeld", age:24, salary:"4,53 Mio. €", contract:"2028", profile:"Rhythmus, Balance, Spielkontrolle.", role:"Hält das Mittelfeld sortiert.", merker:"Metronomspieler", achte:"Wie oft er das Tempo beruhigt oder anzieht" },
   { nr:17, name:"Florian Wirtz", wiki:"Florian_Wirtz", initials:"FW", club:"FC Liverpool", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["OM"], positionDetail:"Offensives Mittelfeld", age:22, salary:"10,40 Mio. £", contract:"2030", profile:"Kreativität, letzter Pass, Raumgefühl.", role:"Kreativzentrum neben Musiala.", merker:"Sieht Lücken, bevor sie existieren", achte:"Pässe zwischen die Linien und Doppelpässe" },
-  { nr:18, name:"Nathaniel Brown", wiki:"Nathaniel_Brown_(Fußballspieler)", initials:"NB", club:"Eintracht Frankfurt", clubFlag:"🇩🇪", pos:["LV"], positionDetail:"Linksverteidiger", age:22, salary:"2,26 Mio. €", contract:"2030", profile:"Dynamisch, jung, linke Seite, viel Laufleistung.", role:"Neue Option links, mögliches Turniergesicht.", merker:"Der neue linke Pfeil", achte:"Wie mutig er nach vorne geht" },
+  { nr:18, name:"Nathaniel Brown", wiki:"Nathaniel_Brown_(Fußballspieler)", imgOverride:"https://assets.bundesliga.com/player/dfl-obj-j01dnm-dfl-clu-00000f-dfl-sea-0001k9-body.png?crop=10,0,75,80&fit=256,256", initials:"NB", club:"Eintracht Frankfurt", clubFlag:"🇩🇪", pos:["LV"], positionDetail:"Linksverteidiger", age:22, salary:"2,26 Mio. €", contract:"2030", profile:"Dynamisch, jung, linke Seite, viel Laufleistung. Deutsch-amerikanische Wurzeln.", role:"Neue Option links, mögliches Turniergesicht.", merker:"Der neue linke Pfeil", achte:"Wie mutig er nach vorne geht" },
   { nr:19, name:"Leroy Sané", wiki:"Leroy_Sané", initials:"LS", club:"Galatasaray Istanbul", clubFlag:"🇹🇷", pos:["LF","RF"], positionDetail:"Flügel", age:30, salary:"11,25 Mio. €", contract:"2028", profile:"Tempo, linker Fuß, Dribbling, Abschluss. Tagesformspieler.", role:"Kann Spiele alleine öffnen.", merker:"Turbo mit Tagesform", achte:"Wenn er von rechts nach innen zieht" },
   { nr:20, name:"Nadiem Amiri", wiki:"Nadiem_Amiri", initials:"NA", club:"1. FSV Mainz 05", clubFlag:"🇩🇪", pos:["ZM","OM"], positionDetail:"Zentrales / offensives Mittelfeld", age:29, salary:"2,83 Mio. €", contract:"2028", profile:"Technik, Standards, Energie, Spielwitz.", role:"Kreativer Rotationsspieler.", merker:"Mainzer Werkzeugkasten", achte:"Freistöße, Ecken, schnelle Kombinationen" },
   { nr:21, name:"Alexander Nübel", wiki:"Alexander_Nübel", initials:"AN", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["TW"], positionDetail:"Torwart", age:29, salary:"4,15 Mio. €", contract:"2026", profile:"Moderner Torwart, stark mit Ball am Fuß, gute Reichweite.", role:"Backup mit Neuer-Schule.", merker:"Neuer-Schüler aus Stuttgart", achte:"Wie ruhig er mit Rückpässen umgeht" },
   { nr:22, name:"David Raum", wiki:"David_Raum", initials:"DR", club:"RB Leipzig", clubFlag:"🇩🇪", pos:["LV"], positionDetail:"Linksverteidiger", age:28, salary:"7,55 Mio. €", contract:"2027", profile:"Flanken, Standards, Energie, linke Breite.", role:"Offensiver Außenverteidiger, macht die Seite auf.", merker:"Außenverteidiger mit Lautsprecher", achte:"Flanken und Standards von links" },
   { nr:23, name:"Felix Nmecha", wiki:"Felix_Nmecha", initials:"FN", club:"Borussia Dortmund", clubFlag:"🇩🇪", pos:["ZM"], positionDetail:"Zentrales Mittelfeld", age:25, salary:"8,02 Mio. €", contract:"2030", profile:"Groß, dynamisch, robust, vertikale Läufe.", role:"Körperliche Mittelfeldoption.", merker:"Langer Achter mit Wucht", achte:"Wenn Deutschland mehr Physis braucht" },
   { nr:24, name:"Malick Thiaw", wiki:"Malick_Thiaw", initials:"MT", club:"Newcastle United", clubFlag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", pos:["IV"], positionDetail:"Innenverteidiger", age:24, salary:"3,90 Mio. £", contract:"2026", profile:"Athletik, Zweikampf, Premier-League-Härte.", role:"Körperliche Alternative in der Innenverteidigung.", merker:"Premier-League-Körper", achte:"Direkte Duelle und Kopfballduelle" },
-  { nr:25, name:"Assan Ouédraogo", wiki:"Assan_Ouédraogo", initials:"AO", club:"RB Leipzig", clubFlag:"🇩🇪", pos:["ZM","OM"], positionDetail:"Zentrales / offensives Mittelfeld", age:20, salary:"1,32 Mio. €", contract:"2029", profile:"Dribbling, Dynamik, Mut, U17-Weltmeister. Nachrücker für Lennart Karl.", role:"Wildcard, Energie- und Talentoption.", merker:"Aus dem Urlaub in den WM-Kader", achte:"Unbeschwerte Dribblings und vertikale Aktionen" },
+  { nr:25, name:"Assan Ouédraogo", wiki:"Assan_Ouédraogo", imgOverride:"https://assets.bundesliga.com/player/dfl-obj-j01kan-dfl-clu-000017-dfl-sea-0001k9-body.png?crop=10,0,75,80&fit=256,256", initials:"AO", club:"RB Leipzig", clubFlag:"🇩🇪", pos:["ZM","OM"], positionDetail:"Zentrales / offensives Mittelfeld", age:20, salary:"1,32 Mio. €", contract:"2029", profile:"Dribbling, Dynamik, Mut, U17-Weltmeister. Nachrücker für Lennart Karl.", role:"Wildcard, Energie- und Talentoption.", merker:"Aus dem Urlaub in den WM-Kader", achte:"Unbeschwerte Dribblings und vertikale Aktionen" },
   { nr:26, name:"Deniz Undav", wiki:"Deniz_Undav", initials:"DU", club:"VfB Stuttgart", clubFlag:"🇩🇪", pos:["ST"], positionDetail:"Mittelstürmer", age:29, salary:"4,53 Mio. €", contract:"2029", profile:"Abschluss, Strafraumgefühl, Emotionalität, Direktheit.", role:"Stürmer, wenn Deutschland Zielstrebigkeit braucht.", merker:"Der, der einfach mal abschließt", achte:"Sucht schneller den Schuss als Havertz" }
 ];
 
@@ -1344,14 +1507,14 @@ const COACH = {
 // WIKIPEDIA PHOTO LOADER
 // ============================================================
 const photoCache = {};
-async function getPhoto(wikiSlug) {
+async function getPhoto(wikiSlug, override) {
+  if (override) return override;
   if (photoCache[wikiSlug] !== undefined) return photoCache[wikiSlug];
   try {
     const r = await fetch(`https://de.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiSlug)}`);
     if (!r.ok) throw new Error('not ok');
     const data = await r.json();
     const url = data.thumbnail?.source || data.originalimage?.source || null;
-    // For more detail, request bigger thumbnail
     let bigUrl = url;
     if (url && data.thumbnail?.source && data.originalimage?.source) {
       bigUrl = data.originalimage.source;
@@ -1363,6 +1526,8 @@ async function getPhoto(wikiSlug) {
     return null;
   }
 }
+// Helper: für Spieler immer p.imgOverride nutzen wenn da
+function getPlayerPhoto(p) { return getPhoto(p.wiki, p.imgOverride); }
 
 // ============================================================
 // TABS
@@ -1374,11 +1539,18 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     document.getElementById(btn.dataset.view).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Bei Live-Tab Leaderboard refreshen (alle 60s frisch)
     if (btn.dataset.view === 'live') {
-      cachedPredictions = {};
-      cachedResults = {};
-      if (typeof loadLeaderboard === 'function') loadLeaderboard();
+      if (typeof loadLeaderboard === 'function') {
+        cachedPredictions = {};
+        cachedResults = {};
+        loadLeaderboard();
+      }
+    }
+    if (btn.dataset.view === 'map' && typeof renderMap === 'function') {
+      renderMap();
+    }
+    if (btn.dataset.view === 'duel' && typeof newDuel === 'function' && !document.getElementById('duelCard').innerHTML.trim()) {
+      newDuel();
     }
   });
 });
@@ -1410,7 +1582,7 @@ async function openPositionModal(pos) {
   openModal('modalPos');
   // Load photos
   for (const p of players) {
-    const url = await getPhoto(p.wiki);
+    const url = await getPlayerPhoto(p);
     if (url) {
       const el = document.getElementById(`ph-list-${p.nr}`);
       if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
@@ -1463,7 +1635,7 @@ async function openPlayerDetail(nr) {
   `;
   openModal('modalPlayer');
   // Load photo
-  const url = await getPhoto(p.wiki);
+  const url = await getPlayerPhoto(p);
   if (url) {
     const heroPhoto = body.querySelector('.hero-photo');
     heroPhoto.innerHTML = `<img src="${url}" alt="${p.name}"><div class="hero-num">#${p.nr}</div>`;
@@ -1544,7 +1716,7 @@ function renderTop7() {
   // Load top7 photos
   TOP7_DATA.forEach(async t => {
     const p = PLAYERS.find(x => x.nr === t.nr);
-    const url = await getPhoto(p.wiki);
+    const url = await getPlayerPhoto(p);
     if (url) {
       const el = document.getElementById(`top7-${p.nr}`);
       if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
@@ -1627,17 +1799,7 @@ function speakBtn(text, label = 'Vorlesen') {
 }
 // Expose globally
 window.speak = speak;
-
-renderTop7();
-renderSchedule();
-renderLive();
-renderStats();
-renderDailyPlayer();
-startCountdown();
-initTrivia();
-renderOdds();
-renderTippGame();
-addSpeakButtonsToGlossary();
+// Init wird ans Ende des Skripts verschoben (siehe initAll am Schluss).
 
 // ============================================================
 // TRIVIA
@@ -1937,6 +2099,265 @@ function addSpeakButtonsToGlossary() {
 }
 
 // ============================================================
+// NEWS
+// ============================================================
+const NEWS = [
+  {
+    type: "pre",
+    badge: "VOR DEM SPIEL",
+    title: "Worum geht's bei dieser WM überhaupt?",
+    date: "9. Juni 2026",
+    body: `<p>Die Fußball-Weltmeisterschaft 2026 wird in <b>drei Ländern</b> ausgetragen: USA, Kanada und Mexiko. Erste Drei-Länder-WM überhaupt. Und: erstmals mit <b>48 statt 32 Mannschaften</b> – die FIFA hat aufgestockt.</p>
+    <p>Das Turnier läuft vom <b>11. Juni bis 19. Juli 2026</b>. Insgesamt 104 Spiele in 16 Stadien. Deutschland spielt in der Gruppenphase nur in <b>Houston, Toronto und New York</b>.</p>
+    <p>Neue Regeln, die du kennen solltest:</p>
+    <ul>
+      <li><b>12 Gruppen mit je 4 Teams</b> – die 2 Besten + die 8 besten Drittplatzierten kommen weiter</li>
+      <li>K.o.-Runde startet mit der Runde der 32 (heißt offiziell „Achtzehntelfinale\")</li>
+      <li>Bedeutet: <b>Selbst mit nur 3 Punkten</b> kann ein Team noch ins Achtelfinale</li>
+    </ul>`,
+  },
+  {
+    type: "pre",
+    badge: "FORM-CHECK",
+    title: "Deutschland in Topform – Bilanz vor dem Turnier",
+    date: "9. Juni 2026",
+    body: `<p>Die DFB-Mannschaft hat in der Vorbereitung <b>fünf Siege in fünf Spielen</b> geholt. Das hat es seit Jahren nicht gegeben.</p>
+    <p>Die letzten Testspiele:</p>
+    <ul>
+      <li>🇩🇪 6:0 🇸🇰 Slowakei</li>
+      <li>🇩🇪 4:3 🇨🇭 Schweiz</li>
+      <li>🇩🇪 2:1 🇬🇭 Ghana</li>
+      <li>🇩🇪 4:0 🇫🇮 Finnland</li>
+      <li>🇩🇪 2:1 🇺🇸 USA</li>
+    </ul>
+    <p>Macht <b>18 Tore in 5 Spielen</b> – im Schnitt 3,6 pro Match. Die Offensive funktioniert. Die Abwehr hat aber auch 5 Gegentore kassiert – da gibt's noch was zu tun.</p>`,
+  },
+  {
+    type: "pre",
+    badge: "GRUPPE E",
+    title: "Wer sind die drei Gegner?",
+    date: "9. Juni 2026",
+    body: `<p>Deutschland spielt in <b>Gruppe E</b> gegen drei sehr unterschiedliche Teams:</p>
+    <p>🇨🇼 <b>Curaçao</b> – ein kleiner Inselstaat in der Karibik (≈150.000 Einwohner!). <b>WM-Debütant.</b> Quote: 1,04 auf deutschen Sieg. Pflichtsieg.</p>
+    <p>🇨🇮 <b>Elfenbeinküste</b> – <b>amtierender Afrikameister</b> 2024. Mit teils Premier-League-erfahrenen Spielern. Schwerster Gegner der Vorrunde nach Ansicht der Buchmacher.</p>
+    <p>🇪🇨 <b>Ecuador</b> – Top-Defensive in der WM-Quali, nur <b>zwei Niederlagen aus 18 Spielen</b>. Gilt als ernster Konkurrent um den Gruppensieg.</p>
+    <p><b>Realistisches Szenario:</b> Deutschland holt 7 Punkte (Sieg gegen Curaçao, Unentschieden gegen Ecuador, knapper Sieg gegen Elfenbeinküste) und wird Gruppenerster.</p>`,
+  },
+  {
+    type: "pre",
+    badge: "TAKTIK",
+    title: "So spielt Nagelsmann",
+    date: "9. Juni 2026",
+    body: `<p>Bundestrainer Julian Nagelsmann (38 J., jüngster Trainer der ganzen WM) setzt auf das <b>4-2-3-1-System</b>: 1 Torwart, 4 Verteidiger, 2 defensive Mittelfeldspieler, 3 offensive Mittelfeldspieler, 1 Stürmer.</p>
+    <p>Seine drei Grundprinzipien:</p>
+    <ul>
+      <li><b>Aggressives Pressing</b> – Gegner sofort nach Ballverlust unter Druck setzen</li>
+      <li><b>Vertikal nach vorne</b> – schnelles Umschaltspiel statt Ballbesitz-Geduld</li>
+      <li><b>Bayern-Achse im Zentrum</b> – Pavlović, Kimmich, Musiala sorgen für die Spielidee</li>
+    </ul>
+    <p>Im Sturm spielt meist <b>Havertz als „falsche Neun\"</b> – kein klassischer Stürmer, der nur im Strafraum lauert, sondern einer der mitspielt und Räume öffnet für Wirtz und Musiala.</p>`,
+  },
+  {
+    type: "pre",
+    badge: "PERSONAL",
+    title: "Karl raus, Ouédraogo rein – das junge Talent als Wildcard",
+    date: "2. Juni 2026",
+    body: `<p>Eine kurzfristige Änderung im Kader: <b>Lennart Karl</b> (FC Bayern) hat sich kurz vor dem Turnier verletzt und musste passen.</p>
+    <p>Nachgerückt ist <b>Assan Ouédraogo</b> (20, RB Leipzig). Der war eigentlich schon im Urlaub und wurde quasi „vom Sandstrand in den WM-Kader\" geholt.</p>
+    <p>Ouédraogo gilt als eines der größten Talente Deutschlands. <b>U17-Weltmeister 2023</b>, jetzt direkt zur A-WM. Robust, dribbelstark, mutig.</p>
+    <p>Er ist nicht für die Stammelf vorgesehen, aber Nagelsmann hat ihm gesagt: „Sei bereit. Du bekommst deine Chance.\"</p>`,
+  },
+];
+
+function renderNews() {
+  document.getElementById('newsList').innerHTML = NEWS.map((n, i) => {
+    // Text für TTS
+    const textBlock = n.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    return `
+    <div class="news-card">
+      <span class="badge ${n.type}">${n.badge}</span>
+      <h3>${n.title}</h3>
+      <div class="date">${n.date}</div>
+      ${n.body}
+      <div class="news-actions">${speakBtn(`${n.title}. ${textBlock}`, 'Vorlesen')}</div>
+    </div>
+  `}).join('');
+}
+
+// ============================================================
+// DUEL (Spieler-Pärchen-Quiz)
+// ============================================================
+const DUEL_QUESTIONS = [
+  { q: "Wer <b>verdient mehr</b>?", field: "salaryNum", higher: true, fmt: (p) => p.salary },
+  { q: "Wer ist <b>älter</b>?", field: "age", higher: true, fmt: (p) => p.age + " Jahre" },
+  { q: "Wer ist <b>jünger</b>?", field: "age", higher: false, fmt: (p) => p.age + " Jahre" },
+  { q: "Wer hat die <b>höhere Trikotnummer</b>?", field: "nr", higher: true, fmt: (p) => "#" + p.nr },
+  { q: "Wessen <b>Vertrag läuft länger</b>?", field: "contract", higher: true, fmt: (p) => "bis " + p.contract },
+];
+
+function salaryNum(p) {
+  const n = parseFloat(p.salary.replace(/[€£,]/g, m => m === ',' ? '.' : '').replace(' Mio.','').replace(/\s/g,''));
+  return p.salary.includes('£') ? n * 1.18 : n;
+}
+
+let duelStats = { right: 0, total: 0, streak: 0 };
+let duelLocked = false;
+
+function newDuel() {
+  duelLocked = false;
+  const q = DUEL_QUESTIONS[Math.floor(Math.random() * DUEL_QUESTIONS.length)];
+  // Pick two different players
+  let a, b;
+  while (true) {
+    a = PLAYERS[Math.floor(Math.random() * PLAYERS.length)];
+    b = PLAYERS[Math.floor(Math.random() * PLAYERS.length)];
+    if (a.nr === b.nr) continue;
+    const vA = q.field === 'salaryNum' ? salaryNum(a) : (q.field === 'contract' ? parseInt(a.contract) : a[q.field]);
+    const vB = q.field === 'salaryNum' ? salaryNum(b) : (q.field === 'contract' ? parseInt(b.contract) : b[q.field]);
+    if (vA === vB) continue; // Skip ties
+    break;
+  }
+  const vA = q.field === 'salaryNum' ? salaryNum(a) : (q.field === 'contract' ? parseInt(a.contract) : a[q.field]);
+  const vB = q.field === 'salaryNum' ? salaryNum(b) : (q.field === 'contract' ? parseInt(b.contract) : b[q.field]);
+  const winnerNr = q.higher ? (vA > vB ? a.nr : b.nr) : (vA < vB ? a.nr : b.nr);
+
+  const cardEl = document.getElementById('duelCard');
+  cardEl.innerHTML = `
+    <div class="duel-q">${q.q}</div>
+    <div class="duel-pair">
+      <div class="duel-option" data-nr="${a.nr}">
+        <div class="ph-fallback" id="duel-ph-${a.nr}">${a.initials}</div>
+        <div class="name">${a.name}</div>
+        <div class="meta">${a.club}</div>
+        <div class="answer">${q.fmt(a)}</div>
+      </div>
+      <div class="duel-option" data-nr="${b.nr}">
+        <div class="ph-fallback" id="duel-ph-${b.nr}">${b.initials}</div>
+        <div class="name">${b.name}</div>
+        <div class="meta">${b.club}</div>
+        <div class="answer">${q.fmt(b)}</div>
+      </div>
+    </div>
+    <div class="duel-feedback" id="duelFeedback">&nbsp;</div>
+  `;
+  // Load photos
+  [a, b].forEach(p => {
+    getPlayerPhoto(p).then(url => {
+      if (url) {
+        const el = document.getElementById(`duel-ph-${p.nr}`);
+        if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
+      }
+    });
+  });
+  cardEl.querySelectorAll('.duel-option').forEach(opt => {
+    opt.addEventListener('click', () => duelPick(parseInt(opt.dataset.nr), winnerNr, opt));
+  });
+}
+
+function duelPick(picked, correct, optEl) {
+  if (duelLocked) return;
+  duelLocked = true;
+  const allOpts = document.querySelectorAll('.duel-option');
+  allOpts.forEach(o => {
+    const nr = parseInt(o.dataset.nr);
+    if (nr === correct) o.classList.add('right');
+    else if (nr === picked) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('duelFeedback');
+  duelStats.total++;
+  if (picked === correct) {
+    duelStats.right++;
+    duelStats.streak++;
+    fb.className = 'duel-feedback right';
+    fb.textContent = '✓ Richtig! Weiter geht\'s …';
+    fireConfetti();
+  } else {
+    duelStats.streak = 0;
+    fb.className = 'duel-feedback wrong';
+    fb.textContent = '✗ Knapp daneben. Nächste …';
+  }
+  updateDuelStats();
+  setTimeout(newDuel, 1800);
+}
+
+function updateDuelStats() {
+  document.getElementById('duelRight').textContent = duelStats.right;
+  document.getElementById('duelTotal').textContent = duelStats.total;
+  document.getElementById('duelStreak').textContent = duelStats.streak;
+}
+
+// ============================================================
+// MAP
+// ============================================================
+const CITIES = [
+  { club: "FC Bayern München", city: "München", flag: "🇩🇪", lat: 48.218, lng: 11.625 },
+  { club: "Borussia Dortmund", city: "Dortmund", flag: "🇩🇪", lat: 51.493, lng: 7.452 },
+  { club: "VfB Stuttgart", city: "Stuttgart", flag: "🇩🇪", lat: 48.792, lng: 9.183 },
+  { club: "RB Leipzig", city: "Leipzig", flag: "🇩🇪", lat: 51.346, lng: 12.379 },
+  { club: "TSG Hoffenheim", city: "Sinsheim", flag: "🇩🇪", lat: 49.239, lng: 8.882 },
+  { club: "1. FSV Mainz 05", city: "Mainz", flag: "🇩🇪", lat: 49.984, lng: 8.224 },
+  { club: "Eintracht Frankfurt", city: "Frankfurt", flag: "🇩🇪", lat: 50.068, lng: 8.645 },
+  { club: "FC Arsenal", city: "London", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", lat: 51.555, lng: -0.108 },
+  { club: "Brighton & Hove Albion", city: "Brighton", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", lat: 50.862, lng: -0.084 },
+  { club: "FC Liverpool", city: "Liverpool", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", lat: 53.431, lng: -2.961 },
+  { club: "Newcastle United", city: "Newcastle", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", lat: 54.975, lng: -1.622 },
+  { club: "Real Madrid", city: "Madrid", flag: "🇪🇸", lat: 40.453, lng: -3.688 },
+  { club: "Galatasaray Istanbul", city: "Istanbul", flag: "🇹🇷", lat: 41.103, lng: 28.991 },
+];
+
+let mapInstance = null;
+let leafletLoaded = false;
+let leafletPromise = null;
+
+function loadLeaflet() {
+  if (leafletPromise) return leafletPromise;
+  leafletPromise = new Promise((resolve, reject) => {
+    if (window.L) { leafletLoaded = true; return resolve(); }
+    const script = document.createElement('script');
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+    script.crossOrigin = "";
+    script.onload = () => { leafletLoaded = true; resolve(); };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  return leafletPromise;
+}
+
+async function renderMap() {
+  await loadLeaflet();
+  if (mapInstance) { mapInstance.invalidateSize(); return; }
+  mapInstance = L.map('mapEl', { zoomControl: true, attributionControl: true }).setView([50, 5], 4);
+  L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap, © CARTO', maxZoom: 18,
+  }).addTo(mapInstance);
+  const clubsWithPlayers = {};
+  CITIES.forEach(c => {
+    const players = PLAYERS.filter(p => p.club === c.club);
+    if (!players.length) return;
+    clubsWithPlayers[c.club] = { ...c, players };
+    const icon = L.divIcon({
+      className: 'club-pin',
+      html: `<span>${players.length}</span>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    L.marker([c.lat, c.lng], { icon })
+      .bindPopup(`<b>${c.flag} ${c.club}</b><br><span style="color:#666;font-size:11px;">${c.city}</span><ul>${players.map(p => `<li>${p.name} (#${p.nr})</li>`).join('')}</ul>`)
+      .addTo(mapInstance);
+  });
+  // Club grid below map
+  const sorted = Object.values(clubsWithPlayers).sort((a, b) => b.players.length - a.players.length);
+  document.getElementById('clubGrid').innerHTML = sorted.map(c => `
+    <div class="club-tile">
+      <span class="count">${c.players.length}</span>
+      <div class="name"><span class="flag">${c.flag}</span>${c.club}</div>
+      <div class="players">${c.players.map(p => p.name.split(' ').pop()).join(' · ')}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
 // CONFETTI
 // ============================================================
 function fireConfetti() {
@@ -2063,7 +2484,7 @@ function renderStats() {
     </div>
   `).join('');
   podiumOrder.forEach(async p => {
-    const url = await getPhoto(p.wiki);
+    const url = await getPlayerPhoto(p);
     if (url) {
       const el = document.getElementById(`podium-${p.nr}`);
       if (el) el.outerHTML = `<img class="podium-ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=podium-ph-fallback>${p.initials}</div>'">`;
@@ -2118,7 +2539,7 @@ function renderDailyPlayer() {
   `;
   card.onclick = () => openPlayerDetail(p.nr);
 
-  getPhoto(p.wiki).then(url => {
+  getPlayerPhoto(p).then(url => {
     if (url) {
       const el = document.getElementById(`daily-${p.nr}`);
       if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
@@ -2166,7 +2587,7 @@ function renderLive() {
 
   // Preload alle Bilder im Hintergrund
   sorted.forEach(async p => {
-    const url = await getPhoto(p.wiki);
+    const url = await getPlayerPhoto(p);
     if (url) {
       const bg = document.getElementById(`bg-${p.nr}`);
       if (bg) {
@@ -2207,6 +2628,25 @@ function applyLiveFilter() {
   });
   document.getElementById('liveNoResult').style.display = visible ? 'none' : 'block';
 }
+
+// ============================================================
+// INIT (am Ende, damit alle const/let oben definiert sind)
+// ============================================================
+function initAll() {
+  renderTop7();
+  renderSchedule();
+  renderLive();
+  renderStats();
+  renderDailyPlayer();
+  startCountdown();
+  initTrivia();
+  renderOdds();
+  renderTippGame();
+  renderNews();
+  addSpeakButtonsToGlossary();
+  // Map und Duel werden lazy gerendert beim Tab-Wechsel
+}
+initAll();
 </script>
 
 </body>
