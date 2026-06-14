@@ -165,7 +165,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 }
 .player-row:active { transform: scale(0.98); }
 .player-row .ph {
-  width: 60px; height: 60px; border-radius: 50%; object-fit: cover; object-position: top;
+  width: 60px; height: 60px; border-radius: 50%; object-fit: cover; object-position: center 15%;
   background: #2a2a2a; flex-shrink: 0;
 }
 .player-row .ph-fallback {
@@ -194,7 +194,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   display: flex; align-items: center; justify-content: center;
 }
 .player-detail .hero-photo img {
-  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  width: 100%; height: 100%; object-fit: cover; object-position: center 18%;
   filter: brightness(0.85);
 }
 .player-detail .hero-photo .ph-fallback {
@@ -256,7 +256,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 }
 .star-card:active { transform: scale(0.98); }
 .star-card .ph {
-  width: 70px; height: 70px; border-radius: 50%; object-fit: cover; object-position: top;
+  width: 70px; height: 70px; border-radius: 50%; object-fit: cover; object-position: center 15%;
   background: #2a2a2a; flex-shrink: 0;
 }
 .star-card .ph-fallback {
@@ -306,6 +306,108 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 }
 .info-box p { font-size: 13px; line-height: 1.55; }
 .info-box b { color: var(--blue); }
+
+/* LIVE TAB - JERSEY GRID */
+.live-search {
+  position: sticky; top: 0; background: var(--bg);
+  padding: 0 0 12px;
+  margin-bottom: 4px;
+  z-index: 10;
+}
+.live-search input {
+  width: 100%; background: var(--card); border: 2px solid var(--border);
+  color: var(--txt); padding: 14px 18px; border-radius: 14px;
+  font-size: 16px; font-family: inherit;
+  transition: border-color 0.2s;
+}
+.live-search input:focus {
+  outline: none; border-color: var(--gold);
+}
+.live-search input::placeholder { color: var(--muted); }
+
+.live-filter {
+  display: flex; gap: 6px; overflow-x: auto;
+  margin-bottom: 14px; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.live-filter::-webkit-scrollbar { display: none; }
+.live-filter button {
+  flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border); color: var(--muted);
+  padding: 7px 14px; border-radius: 999px; font-size: 13px;
+  font-family: inherit; cursor: pointer; font-weight: 600;
+}
+.live-filter button.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+.jersey-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+@media (min-width: 480px) { .jersey-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 720px) { .jersey-grid { grid-template-columns: repeat(5, 1fr); } }
+
+.jersey {
+  position: relative; aspect-ratio: 0.85;
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+  cursor: pointer; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.jersey:active { transform: scale(0.96); }
+.jersey.hidden { display: none; }
+.jersey-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center 15%;
+  opacity: 0.4;
+}
+.jersey-bg.placeholder {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 900; font-size: 32px; opacity: 0.25;
+}
+.jersey-num {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 28px; font-weight: 900; color: white;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  line-height: 1;
+}
+.jersey-pos-tag {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 9px; font-weight: 800; letter-spacing: 1px;
+  padding: 2px 6px; border-radius: 3px;
+}
+.jersey-pos-tag.tw { background: var(--blue); color: white; }
+.jersey-pos-tag.def { background: var(--red); color: white; }
+.jersey-pos-tag.mid { background: var(--green); color: white; }
+.jersey-pos-tag.att { background: var(--orange); color: white; }
+.jersey-name {
+  position: relative; z-index: 2;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  padding: 18px 8px 8px;
+  font-weight: 700; font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+}
+.jersey-name .surname {
+  display: block; font-size: 13px;
+}
+.jersey-name .firstname {
+  display: block; font-size: 10px; color: var(--muted); margin-bottom: 2px;
+}
+
+.live-noresult {
+  text-align: center; padding: 40px 20px; color: var(--muted);
+  background: var(--card); border-radius: 14px; border: 1px solid var(--border);
+}
+
+.live-hint {
+  background: linear-gradient(135deg, rgba(255,206,0,0.08), rgba(255,206,0,0.02));
+  border: 1px solid rgba(255,206,0,0.25);
+  border-radius: 12px; padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 12px; line-height: 1.5; color: var(--txt);
+}
+.live-hint b { color: var(--gold); }
 </style>
 </head>
 <body>
@@ -316,6 +418,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <h1>WM <span class="accent">2026</span> · DFB-Kader</h1>
   </div>
   <nav class="tabs">
+    <button class="tab" data-view="live">🔴 Live</button>
     <button class="tab active" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 Spielplan</button>
@@ -325,6 +428,29 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 </header>
 
 <main class="content">
+
+<!-- LIVE VIEW -->
+<div class="view" id="live">
+  <h2>🔴 Im Spiel</h2>
+  <p class="lead">Du siehst gerade einen Spieler auf dem TV und willst wissen wer das ist? Trikotnummer suchen oder antippen.</p>
+
+  <div class="live-search">
+    <input type="text" id="liveSearch" placeholder="🔍 Trikotnummer oder Name eingeben …" inputmode="text" autocomplete="off">
+  </div>
+
+  <div class="live-filter">
+    <button class="active" data-pos="all">Alle</button>
+    <button data-pos="TW">Tor</button>
+    <button data-pos="DEF">Abwehr</button>
+    <button data-pos="MID">Mittelfeld</button>
+    <button data-pos="ATT">Angriff</button>
+  </div>
+
+  <div class="live-hint">💡 <b>Tipp:</b> Sortiert nach Trikotnummer. Du siehst die <b>4</b> auf dem Rücken → tippst auf die Karte mit der 4 → kennst den Spieler in 2 Sekunden.</div>
+
+  <div class="jersey-grid" id="jerseyGrid"></div>
+  <div class="live-noresult" id="liveNoResult" style="display:none;">Kein Spieler gefunden 🤷</div>
+</div>
 
 <!-- PITCH VIEW -->
 <div class="view active" id="pitch">
@@ -840,6 +966,89 @@ function renderSchedule() {
 
 renderTop7();
 renderSchedule();
+renderLive();
+
+// ============================================================
+// LIVE VIEW
+// ============================================================
+function posCategory(player) {
+  if (player.pos.includes('TW')) return 'TW';
+  if (player.pos.some(p => ['IV','LV','RV'].includes(p))) return 'DEF';
+  if (player.pos.some(p => ['DM','ZM','OM'].includes(p))) return 'MID';
+  if (player.pos.some(p => ['LF','RF','ST'].includes(p))) return 'ATT';
+  return 'MID';
+}
+function posCatToCss(cat) {
+  return { TW: 'tw', DEF: 'def', MID: 'mid', ATT: 'att' }[cat];
+}
+function posCatLabel(cat) {
+  return { TW: 'TOR', DEF: 'DEF', MID: 'MID', ATT: 'OFF' }[cat];
+}
+
+function renderLive() {
+  const sorted = [...PLAYERS].sort((a,b) => a.nr - b.nr);
+  const html = sorted.map(p => {
+    const cat = posCategory(p);
+    const parts = p.name.split(' ');
+    const surname = parts.pop();
+    const firstname = parts.join(' ');
+    return `
+      <div class="jersey" data-nr="${p.nr}" data-name="${p.name.toLowerCase()}" data-cat="${cat}" onclick="openPlayerDetail(${p.nr})">
+        <div class="jersey-bg placeholder" id="bg-${p.nr}">${p.initials}</div>
+        <div class="jersey-pos-tag ${posCatToCss(cat)}">${posCatLabel(cat)}</div>
+        <div class="jersey-num">${p.nr}</div>
+        <div class="jersey-name">
+          <span class="firstname">${firstname}</span>
+          <span class="surname">${surname}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('jerseyGrid').innerHTML = html;
+
+  // Preload alle Bilder im Hintergrund
+  sorted.forEach(async p => {
+    const url = await getPhoto(p.wiki);
+    if (url) {
+      const bg = document.getElementById(`bg-${p.nr}`);
+      if (bg) {
+        bg.style.backgroundImage = `url("${url}")`;
+        bg.classList.remove('placeholder');
+        bg.textContent = '';
+      }
+    }
+  });
+}
+
+// Search
+document.getElementById('liveSearch').addEventListener('input', e => {
+  applyLiveFilter();
+});
+// Position filter
+document.querySelectorAll('.live-filter button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.live-filter button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyLiveFilter();
+  });
+});
+function applyLiveFilter() {
+  const q = document.getElementById('liveSearch').value.trim().toLowerCase();
+  const activeBtn = document.querySelector('.live-filter button.active');
+  const cat = activeBtn ? activeBtn.dataset.pos : 'all';
+  let visible = 0;
+  document.querySelectorAll('.jersey').forEach(j => {
+    const matchName = !q || j.dataset.name.includes(q) || j.dataset.nr === q || j.dataset.nr.startsWith(q);
+    const matchCat = cat === 'all' || j.dataset.cat === cat;
+    if (matchName && matchCat) {
+      j.classList.remove('hidden');
+      visible++;
+    } else {
+      j.classList.add('hidden');
+    }
+  });
+  document.getElementById('liveNoResult').style.display = visible ? 'none' : 'block';
+}
 </script>
 
 </body>
