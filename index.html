@@ -559,6 +559,119 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 }
 .daily-card .name { font-weight: 800; font-size: 16px; line-height: 1.2; }
 .daily-card .merker { font-size: 12px; color: var(--gold); margin-top: 6px; font-weight: 600; line-height: 1.3; }
+
+/* TRIVIA TAB */
+.trivia-shell {
+  background: linear-gradient(135deg, #1a1a1a, #2a1a0a);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 30px 24px;
+  min-height: 360px;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.trivia-shell::before {
+  content: ""; position: absolute; top: -50%; right: -30%;
+  width: 80%; height: 200%;
+  background: radial-gradient(var(--gold) 0%, transparent 60%);
+  opacity: 0.05; pointer-events: none;
+}
+.trivia-progress {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.trivia-progress .pill {
+  background: var(--card-2); border-radius: 999px;
+  padding: 4px 10px; font-size: 11px; color: var(--muted); font-weight: 700;
+  letter-spacing: 1px;
+}
+.trivia-progress .pill.cat {
+  background: var(--gold); color: #000;
+}
+.trivia-question {
+  font-size: 22px; font-weight: 800; line-height: 1.3;
+  margin-bottom: 22px; min-height: 110px;
+  display: flex; align-items: center;
+  letter-spacing: -0.3px;
+}
+.trivia-question b { color: var(--gold); }
+.trivia-answer {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+  min-height: 80px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  text-align: center;
+  margin-bottom: 18px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s;
+}
+.trivia-answer.hidden {
+  background: var(--card-2);
+  border-style: dashed;
+}
+.trivia-answer.hidden .reveal-prompt {
+  color: var(--gold); font-weight: 700; font-size: 14px;
+}
+.trivia-answer.hidden .answer-content { display: none; }
+.trivia-answer .answer-main {
+  font-size: 26px; font-weight: 900;
+  color: var(--gold); line-height: 1.2; margin-bottom: 6px;
+}
+.trivia-answer .answer-sub {
+  font-size: 13px; color: var(--txt); line-height: 1.5;
+  max-width: 100%;
+}
+.trivia-answer .answer-link {
+  font-size: 11px; color: var(--muted); margin-top: 8px;
+  text-decoration: underline;
+}
+.trivia-controls {
+  display: flex; gap: 10px;
+  margin-top: auto;
+}
+.trivia-controls button {
+  flex: 1;
+  background: var(--gold); color: #000; border: 0;
+  padding: 14px; border-radius: 12px; font-weight: 800;
+  font-family: inherit; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.trivia-controls button.ghost {
+  background: var(--card-2); color: var(--txt); border: 1px solid var(--border);
+}
+.trivia-controls button:active { transform: scale(0.97); }
+
+/* CONFETTI */
+.confetti-wrap {
+  position: fixed; inset: 0; pointer-events: none; z-index: 200;
+  overflow: hidden;
+}
+.confetti {
+  position: absolute; top: -20px;
+  width: 10px; height: 16px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* TRIVIA CATEGORY FILTER */
+.cat-filter {
+  display: flex; gap: 6px; overflow-x: auto;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cat-filter::-webkit-scrolbar { display: none; }
+.cat-filter button {
+  flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border); color: var(--muted);
+  padding: 7px 13px; border-radius: 999px; font-size: 12px;
+  font-family: inherit; cursor: pointer; font-weight: 600;
+  white-space: nowrap;
+}
+.cat-filter button.active { background: var(--gold); color: #000; border-color: var(--gold); }
 </style>
 </head>
 <body>
@@ -574,6 +687,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 Spielplan</button>
     <button class="tab" data-view="stats">📊 Stats</button>
+    <button class="tab" data-view="trivia">🎉 Trivia</button>
     <button class="tab" data-view="glossar">📖 Glossar</button>
     <button class="tab" data-view="info">ℹ️ Infos</button>
   </nav>
@@ -760,6 +874,37 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <div class="info-box">
     <div class="ttl">🎉 FUN FACT</div>
     <p id="statFunFact">…</p>
+  </div>
+</div>
+
+<!-- TRIVIA -->
+<div class="view" id="trivia">
+  <h2>🎉 Trivia in der Gruppe</h2>
+  <p class="lead">Frage vorlesen, alle rumraten lassen, dann antippen für die Antwort. Macht jede WM-Party besser.</p>
+
+  <div class="cat-filter" id="catFilter">
+    <button class="active" data-cat="all">Alle</button>
+    <button data-cat="💰">💰 Geld</button>
+    <button data-cat="👤">👤 Karriere</button>
+    <button data-cat="🌍">🌍 Vereine</button>
+    <button data-cat="😜">😜 Fun</button>
+    <button data-cat="🏆">🏆 Rekorde</button>
+  </div>
+
+  <div class="trivia-shell">
+    <div class="trivia-progress">
+      <span class="pill cat" id="triviaCat">KATEGORIE</span>
+      <span class="pill" id="triviaCount">1 / 30</span>
+    </div>
+    <div class="trivia-question" id="triviaQ">Frage</div>
+    <div class="trivia-answer hidden" id="triviaA" onclick="revealAnswer()">
+      <span class="reveal-prompt">👆 Antippen zum Aufdecken</span>
+      <div class="answer-content"></div>
+    </div>
+    <div class="trivia-controls">
+      <button class="ghost" onclick="shuffleTrivia()">🔀 Mischen</button>
+      <button onclick="nextTrivia()">Nächste →</button>
+    </div>
   </div>
 </div>
 
@@ -1173,6 +1318,128 @@ renderLive();
 renderStats();
 renderDailyPlayer();
 startCountdown();
+initTrivia();
+
+// ============================================================
+// TRIVIA
+// ============================================================
+const TRIVIA = [
+  // GELD 💰
+  { cat:"💰", catName:"GELD", q:"Wer verdient im DFB-Kader <b>am meisten</b>?", a:"Manuel Neuer", sub:"21 Mio. € brutto/Jahr beim FC Bayern. Der Torwart-Opa ist der teuerste Mann im Team.", goto:1 },
+  { cat:"💰", catName:"GELD", q:"Schätzt mal: Wie hoch ist das <b>Jahres-Gesamtgehalt</b> aller 26 Spieler zusammen?", a:"≈ 215 Mio. €", sub:"Allein an Grundgehältern. Werbedeals nicht mitgerechnet." },
+  { cat:"💰", catName:"GELD", q:"Welcher Spieler verdient <b>am wenigsten</b> im Kader?", a:"Assan Ouédraogo", sub:"Mit 1,32 Mio. €/Jahr bei RB Leipzig. Der jüngste hat noch keinen Top-Vertrag.", goto:25 },
+  { cat:"💰", catName:"GELD", q:"Was verdient <b>Musiala pro Tag</b>?", a:"≈ 57.000 €", sub:"20,75 Mio. € durch 365 Tage. Pro Stunde sind das auch noch ~2.370 €.", goto:10 },
+  { cat:"💰", catName:"GELD", q:"Was verdient <b>Kimmich</b> in einer einzigen 90-minütigen Halbzeit?", a:"≈ 9.100 €", sub:"Bei 20 Mio. €/Jahr. Mehr als die meisten Leute in einem Monat verdienen.", goto:6 },
+  { cat:"💰", catName:"GELD", q:"Welcher <b>20-Jährige</b> verdient schon über 20 Mio. €/Jahr?", a:"Jamal Musiala", sub:"Naja, 22 ist er. Aber trotzdem absurd – mehr als doppelt so viel wie Wirtz.", goto:10 },
+
+  // KARRIERE 👤
+  { cat:"👤", catName:"KARRIERE", q:"Wer ist der <b>älteste</b> Spieler im Kader?", a:"Manuel Neuer", sub:"40 Jahre alt. Spielt seine 4. Weltmeisterschaft.", goto:1 },
+  { cat:"👤", catName:"KARRIERE", q:"Und wer ist der <b>jüngste</b>?", a:"Assan Ouédraogo", sub:"Erst 20. War nicht mal im ursprünglichen Kader – Nachrücker für den verletzten Lennart Karl.", goto:25 },
+  { cat:"👤", catName:"KARRIERE", q:"Welcher Spieler war als Teenager <b>U17-Weltmeister</b>?", a:"Assan Ouédraogo", sub:"Mit Deutschland 2023. Jetzt direkt zur A-WM 2026.", goto:25 },
+  { cat:"👤", catName:"KARRIERE", q:"Welche zwei Spieler tragen den <b>gleichen Nachnamen</b> in der DFB-Geschichte (Felix und sein Bruder)?", a:"Nmecha", sub:"Felix Nmecha ist im Kader. Sein Bruder Lukas Nmecha spielt auch für Deutschland – aktuell aber nicht nominiert." },
+  { cat:"👤", catName:"KARRIERE", q:"Wer ist <b>Kapitän</b> und steht vor seiner <b>3. WM</b>?", a:"Joshua Kimmich", sub:"FC Bayern. Wenn die Mannschaft Ordnung braucht – er ruft.", goto:6 },
+  { cat:"👤", catName:"KARRIERE", q:"Wer ist <b>jünger als der Bundestrainer</b>?", a:"Sehr viele", sub:"Nagelsmann ist 38. 17 von 26 Spielern (alle außer Neuer und Groß sowie Rüdiger, Goretzka, Sané, Kimmich, Tah, Anton, Baumann) sind jünger." },
+
+  // VEREINE 🌍
+  { cat:"🌍", catName:"VEREINE", q:"Wie viele Spieler kommen vom <b>FC Bayern München</b>?", a:"6 Spieler", sub:"Neuer, Tah, Pavlović, Kimmich, Goretzka, Musiala. Fast ein Viertel des Kaders." },
+  { cat:"🌍", catName:"VEREINE", q:"Wer ist der <b>einzige Spieler aus der türkischen Liga</b>?", a:"Leroy Sané", sub:"Galatasaray Istanbul. Verdient dort 11,25 Mio. €/Jahr.", goto:19 },
+  { cat:"🌍", catName:"VEREINE", q:"Welcher Spieler wechselte zur Saison 2025/26 zu <b>Liverpool</b>?", a:"Florian Wirtz", sub:"Für eine Rekordablöse. Bekam dort den Rückennummer-Slot, der für Stars reserviert ist.", goto:17 },
+  { cat:"🌍", catName:"VEREINE", q:"Wer spielt bei <b>Real Madrid</b>?", a:"Antonio Rüdiger", sub:"Seit 2022. Holte mit den Königlichen die Champions League.", goto:2 },
+  { cat:"🌍", catName:"VEREINE", q:"Welches Trio spielt zusammen für <b>Borussia Dortmund</b>?", a:"Anton, Schlotterbeck, Nmecha (+ Beier)", sub:"Eigentlich ein Quartett – BVB stellt 4 Spieler." },
+  { cat:"🌍", catName:"VEREINE", q:"Wie viele Spieler kicken normalerweise <b>im Ausland</b>?", a:"7 Spieler", sub:"Rüdiger (Spanien), Havertz, Groß, Wirtz, Woltemade, Thiaw (alle England), Sané (Türkei)." },
+  { cat:"🌍", catName:"VEREINE", q:"Welche zwei DFB-Spieler spielen bei <b>Newcastle United</b>?", a:"Woltemade & Thiaw", sub:"Newcastle hat sich mit deutschen Stars verstärkt." },
+
+  // FUN 😜
+  { cat:"😜", catName:"FUN", q:"Wer trägt den Spitznamen „<b>Bambi im Slalom</b>\"?", a:"Jamal Musiala", sub:"Wegen seiner Wendigkeit und der Eleganz auf engstem Raum.", goto:10 },
+  { cat:"😜", catName:"FUN", q:"Welcher Spieler wird „<b>Schachspieler mit Fußballschuhen</b>\" genannt?", a:"Pascal Groß", sub:"Brighton-Star, 34 Jahre. Bekannt für seine Spielintelligenz und Standards.", goto:13 },
+  { cat:"😜", catName:"FUN", q:"Wer ist „<b>der Security-Mann</b>\" der Defensive?", a:"Antonio Rüdiger", sub:"Härte, Tempo, Einschüchterung. Wenn's hektisch wird, übernimmt er.", goto:2 },
+  { cat:"😜", catName:"FUN", q:"Welcher Stürmer ist mit <b>über 1,98 m</b> der längste Spieler im Kader?", a:"Nick Woltemade", sub:"1,98 m. Der „lange Stürmer, aber nicht nur Kopfballstange\".", goto:11 },
+  { cat:"😜", catName:"FUN", q:"Welcher Spieler kam <b>aus dem Urlaub direkt in den WM-Kader</b>?", a:"Assan Ouédraogo", sub:"Nachnominiert für Lennart Karl, der sich verletzt hat.", goto:25 },
+  { cat:"😜", catName:"FUN", q:"Wer ist „<b>der Neuer-Schüler aus Stuttgart</b>\"?", a:"Alexander Nübel", sub:"Sollte beim FC Bayern mal Neuers Nachfolger werden – wurde nichts draus, jetzt in Stuttgart.", goto:21 },
+  { cat:"😜", catName:"FUN", q:"Welcher Spieler kommt aus dem <b>FSV Mainz 05</b> – einem eher kleinen Bundesligaclub?", a:"Nadiem Amiri", sub:"Der „Mainzer Werkzeugkasten\". Standards, Energie, Spielwitz.", goto:20 },
+
+  // REKORDE 🏆
+  { cat:"🏆", catName:"REKORDE", q:"Wie viele <b>WM-Titel</b> hat Deutschland insgesamt?", a:"4 Sterne", sub:"1954 (Bern), 1974, 1990, 2014 (Brasilien). Sterne über dem DFB-Logo." },
+  { cat:"🏆", catName:"REKORDE", q:"Wo findet die <b>WM 2026</b> statt?", a:"USA, Kanada & Mexiko", sub:"Erste Drei-Länder-WM. Erste mit 48 statt 32 Mannschaften." },
+  { cat:"🏆", catName:"REKORDE", q:"Wer ist der <b>jüngste Trainer</b> der gesamten WM 2026?", a:"Julian Nagelsmann", sub:"38 Jahre. Erste WM als Bundestrainer." },
+  { cat:"🏆", catName:"REKORDE", q:"Wie heißt Deutschlands <b>Gruppe</b> bei der WM 2026?", a:"Gruppe E", sub:"Mit Curaçao, Elfenbeinküste und Ecuador. Gilt als machbare Gruppe." }
+];
+
+let triviaIdx = 0;
+let triviaCurrent = [...TRIVIA];
+let triviaCat = "all";
+
+function initTrivia() {
+  shuffleTrivia();
+  document.querySelectorAll('.cat-filter button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-filter button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      triviaCat = btn.dataset.cat;
+      triviaCurrent = triviaCat === 'all' ? [...TRIVIA] : TRIVIA.filter(t => t.cat === triviaCat);
+      shuffleTrivia();
+    });
+  });
+}
+
+function shuffleTrivia() {
+  triviaCurrent = [...triviaCurrent].sort(() => Math.random() - 0.5);
+  triviaIdx = 0;
+  showTrivia();
+}
+
+function nextTrivia() {
+  triviaIdx = (triviaIdx + 1) % triviaCurrent.length;
+  showTrivia();
+}
+
+function showTrivia() {
+  const t = triviaCurrent[triviaIdx];
+  if (!t) return;
+  document.getElementById('triviaCat').textContent = t.catName;
+  document.getElementById('triviaCount').textContent = `${triviaIdx + 1} / ${triviaCurrent.length}`;
+  document.getElementById('triviaQ').innerHTML = t.q;
+  const ansEl = document.getElementById('triviaA');
+  ansEl.classList.add('hidden');
+  const link = t.goto ? `<div class="answer-link" onclick="event.stopPropagation(); closeModalAll(); openPlayerDetail(${t.goto})">→ Spieler-Profil öffnen</div>` : '';
+  ansEl.querySelector('.answer-content').innerHTML = `
+    <div class="answer-main">${t.a}</div>
+    <div class="answer-sub">${t.sub}</div>
+    ${link}
+  `;
+}
+
+function revealAnswer() {
+  const ans = document.getElementById('triviaA');
+  if (!ans.classList.contains('hidden')) return;
+  ans.classList.remove('hidden');
+  fireConfetti();
+}
+
+function closeModalAll() {
+  ['modalPos','modalPlayer','modalCoach'].forEach(id => closeModal(id));
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function fireConfetti() {
+  const colors = ['#FFCE00','#DD0000','#000','#fff','#4caf50'];
+  const wrap = document.createElement('div');
+  wrap.className = 'confetti-wrap';
+  document.body.appendChild(wrap);
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+    c.style.animationDelay = (Math.random() * 0.3) + 's';
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    wrap.appendChild(c);
+  }
+  setTimeout(() => wrap.remove(), 3500);
+}
 
 // ============================================================
 // COUNTDOWN
