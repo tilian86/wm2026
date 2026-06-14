@@ -614,6 +614,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 .trivia-answer.hidden .reveal-prompt {
   color: var(--gold); font-weight: 700; font-size: 14px;
 }
+.trivia-answer:not(.hidden) .reveal-prompt { display: none; }
 .trivia-answer.hidden .answer-content { display: none; }
 .trivia-answer .answer-main {
   font-size: 26px; font-weight: 900;
@@ -1020,6 +1021,207 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   margin-bottom: 6px;
 }
 .club-tile .players { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* WM TABELLE */
+.wm-controls {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.wm-updated {
+  flex: 1; font-size: 11px; color: var(--muted); text-align: right;
+}
+.wm-group {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  margin-bottom: 14px;
+}
+.wm-group.highlight { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.wm-group-title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 800; letter-spacing: 1px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.wm-group-title .deu-tag {
+  background: var(--red); color: white;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: 9px; letter-spacing: 1px;
+}
+.wm-table {
+  width: 100%; font-size: 12px; border-collapse: collapse;
+  margin-bottom: 12px;
+}
+.wm-table th, .wm-table td {
+  padding: 6px 4px; text-align: left;
+}
+.wm-table th {
+  font-size: 9px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: 1px; border-bottom: 1px solid var(--border);
+}
+.wm-table td { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.wm-table tr:last-child td { border-bottom: 0; }
+.wm-table .num { text-align: center; color: var(--muted); width: 22px; }
+.wm-table .team-flag { margin-right: 6px; }
+.wm-table .team { font-weight: 600; }
+.wm-table .pts { text-align: right; font-weight: 800; color: var(--gold); width: 32px; }
+.wm-table tr.advances .team { color: var(--green); }
+.wm-table tr.eliminated .team { color: var(--muted); text-decoration: line-through; opacity: 0.5; }
+.wm-table tr.deu { background: rgba(255,206,0,0.08); }
+.wm-table tr.deu .team::after { content: ' 🇩🇪'; }
+
+.wm-matches { display: grid; gap: 6px; }
+.wm-match {
+  display: grid; grid-template-columns: 1fr 80px 1fr;
+  align-items: center; gap: 8px;
+  background: var(--card-2); border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.wm-match:active { transform: scale(0.98); }
+.wm-match:hover { background: rgba(255,206,0,0.06); }
+.wm-match .home { text-align: right; }
+.wm-match .away { text-align: left; }
+.wm-match .score {
+  text-align: center; font-weight: 900; font-size: 16px;
+  background: var(--card); border-radius: 6px;
+  padding: 4px 6px;
+}
+.wm-match.live .score {
+  background: var(--red); color: white; animation: blinkBg 1.5s infinite;
+}
+.wm-match.pending .score { color: var(--muted); font-weight: 600; font-size: 12px; }
+.wm-match.finished .score { color: var(--gold); }
+
+.wm-loading {
+  text-align: center; padding: 30px; color: var(--muted);
+}
+
+/* Match Detail Modal */
+.match-detail .ko-header {
+  text-align: center; margin-bottom: 18px;
+  padding: 14px; background: var(--card-2); border-radius: 12px;
+}
+.match-detail .ko-header .teams {
+  font-size: 18px; font-weight: 800; margin-bottom: 6px;
+}
+.match-detail .ko-header .big-score {
+  font-size: 42px; font-weight: 900; color: var(--gold); line-height: 1;
+}
+.match-detail .ko-header .meta {
+  font-size: 11px; color: var(--muted); margin-top: 8px;
+}
+.match-detail .scorers {
+  margin-bottom: 14px;
+}
+.match-detail .scorers h4 {
+  font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px;
+}
+.match-detail .scorer-list {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 13px;
+}
+.match-detail .scorer-list div::before { content: '⚽ '; }
+
+/* GUESS */
+.guess-setup, .guess-play, .guess-final {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px;
+}
+.guess-setup h3 { font-size: 16px; margin-bottom: 8px; }
+.guess-setup .lead-sm { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.guess-names {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
+}
+.guess-name-row {
+  display: flex; gap: 6px; align-items: center;
+}
+.guess-name-row input {
+  flex: 1; background: var(--card-2); border: 1px solid var(--border);
+  color: var(--txt); padding: 10px 12px; border-radius: 10px;
+  font-family: inherit; font-size: 14px;
+}
+.guess-name-row input:focus { outline: none; border-color: var(--gold); }
+.guess-name-row button {
+  background: transparent; border: 0; color: var(--muted);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+  font-family: inherit;
+}
+.guess-start, .guess-next {
+  background: var(--gold); color: #000; border: 0;
+  width: 100%; padding: 14px; border-radius: 12px;
+  font-weight: 800; font-size: 15px; cursor: pointer;
+  font-family: inherit;
+  margin-top: 8px;
+}
+.guess-start:disabled, .guess-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.guess-play .question {
+  font-size: 18px; font-weight: 800; line-height: 1.3;
+  margin-bottom: 6px; letter-spacing: -0.3px;
+}
+.guess-play .q-meta { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.guess-play .turn {
+  text-align: center; font-size: 16px; font-weight: 700;
+  background: var(--card-2); border-radius: 10px;
+  padding: 12px; margin-bottom: 14px;
+}
+.guess-play .turn span { color: var(--gold); }
+.guess-play .input-row {
+  display: flex; gap: 8px; margin-bottom: 14px;
+}
+.guess-play .input-row input {
+  flex: 1; background: var(--card-2); border: 2px solid var(--border);
+  color: var(--txt); padding: 16px 14px; border-radius: 12px;
+  font-family: inherit; font-size: 24px; font-weight: 800;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.guess-play .input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.guess-play .input-row input:focus { outline: none; border-color: var(--gold); }
+.guess-play .input-row button {
+  background: var(--gold); color: #000; border: 0;
+  padding: 14px 22px; border-radius: 12px;
+  font-weight: 800; font-size: 15px; cursor: pointer;
+  font-family: inherit;
+}
+
+.guess-reveal {
+  text-align: center; padding: 18px;
+}
+.guess-reveal .answer-num {
+  font-size: 64px; font-weight: 900; color: var(--gold);
+  line-height: 1;
+}
+.guess-reveal .answer-unit { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+.guess-reveal .explain {
+  background: var(--card-2); border-radius: 10px;
+  padding: 12px; font-size: 12px; line-height: 1.5;
+  text-align: left; margin-bottom: 14px;
+}
+
+.guess-results {
+  display: grid; gap: 6px; margin-bottom: 14px;
+}
+.guess-result-row {
+  display: grid; grid-template-columns: 1fr 80px 60px;
+  align-items: center; gap: 8px;
+  background: var(--card-2); border-radius: 8px;
+  padding: 10px 12px; font-size: 13px;
+}
+.guess-result-row .nm { font-weight: 700; }
+.guess-result-row .gs { text-align: center; color: var(--muted); }
+.guess-result-row .pt { text-align: right; font-weight: 800; color: var(--gold); }
+.guess-result-row.winner { background: linear-gradient(135deg, rgba(255,206,0,0.2), rgba(255,206,0,0.05)); border: 1px solid var(--gold); }
+
+.guess-final h3 { font-size: 20px; margin-bottom: 6px; text-align: center; }
+.guess-final .crown { font-size: 48px; text-align: center; margin: 14px 0 8px; }
+.guess-final .lead-sm { font-size: 13px; color: var(--muted); margin-bottom: 18px; text-align: center; }
+.guess-final .leaderboard-final {
+  background: var(--card-2); border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
 </style>
 </head>
 <body>
@@ -1032,12 +1234,14 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <nav class="tabs">
     <button class="tab active" data-view="news">📰 News</button>
     <button class="tab" data-view="live">🔴 Live</button>
+    <button class="tab" data-view="wm">🏆 WM-Tabelle</button>
     <button class="tab" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
-    <button class="tab" data-view="schedule">📅 Spielplan</button>
+    <button class="tab" data-view="schedule">📅 DFB-Plan</button>
+    <button class="tab" data-view="duel">🎲 Duell</button>
+    <button class="tab" data-view="guess">💡 Schätzen</button>
     <button class="tab" data-view="stats">📊 Stats</button>
     <button class="tab" data-view="trivia">🎉 Trivia</button>
-    <button class="tab" data-view="duel">🎲 Duell</button>
     <button class="tab" data-view="map">🗺️ Karte</button>
     <button class="tab" data-view="glossar">📖 Glossar</button>
     <button class="tab" data-view="info">ℹ️ Infos</button>
@@ -1063,6 +1267,25 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <h2>📰 Was du wissen musst</h2>
   <p class="lead">Schnellüberblick für alle, die nicht jeden Tag Fußballnachrichten lesen. Aktualisiert vor und nach jedem Spiel.</p>
   <div id="newsList"></div>
+</div>
+
+<!-- WM-TABELLE -->
+<div class="view" id="wm">
+  <h2>🏆 WM 2026 – komplette Übersicht</h2>
+  <p class="lead">Alle 12 Gruppen, alle Spiele, alle Ergebnisse. Aktualisiert sich automatisch sobald die Community-Daten neu sind. Tippe auf ein Spiel für den Kurzbericht.</p>
+  <div class="wm-controls">
+    <button class="chip active" data-grp="all" id="wmGrpAll">Alle Gruppen</button>
+    <span id="wmUpdated" class="wm-updated">Lade …</span>
+    <button class="chip" id="wmRefresh" onclick="loadWMData(true)">🔄 Aktualisieren</button>
+  </div>
+  <div id="wmGroups"></div>
+</div>
+
+<!-- SCHÄTZEN -->
+<div class="view" id="guess">
+  <h2>💡 Schätzen in der Gruppe</h2>
+  <p class="lead">Pass-the-Phone-Spiel: jeder schätzt eine Zahl, wer am nächsten dran ist gewinnt die Runde. Lerne ganz nebenbei Fakten über den DFB-Kader und die WM.</p>
+  <div id="guessShell"></div>
 </div>
 
 <!-- DUEL VIEW -->
@@ -1303,7 +1526,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
       <span class="pill" id="triviaCount">1 / 30</span>
     </div>
     <div class="trivia-question" id="triviaQ">Frage</div>
-    <div class="trivia-answer hidden" id="triviaA" onclick="revealAnswer()">
+    <div class="trivia-answer hidden" id="triviaA">
       <span class="reveal-prompt">👆 Antippen zum Aufdecken</span>
       <div class="answer-content"></div>
     </div>
@@ -1551,6 +1774,12 @@ document.querySelectorAll('.tab').forEach(btn => {
     }
     if (btn.dataset.view === 'duel' && typeof newDuel === 'function' && !document.getElementById('duelCard').innerHTML.trim()) {
       newDuel();
+    }
+    if (btn.dataset.view === 'wm' && typeof loadWMData === 'function') {
+      loadWMData(false);
+    }
+    if (btn.dataset.view === 'guess' && typeof startGuessSetup === 'function' && !document.getElementById('guessShell').innerHTML.trim()) {
+      startGuessSetup();
     }
   });
 });
@@ -1851,6 +2080,16 @@ let triviaCurrent = [...TRIVIA];
 let triviaCat = "all";
 
 function initTrivia() {
+  // Click-Handler EINMAL anhängen
+  const triviaA = document.getElementById('triviaA');
+  if (triviaA && !triviaA._handlerAttached) {
+    triviaA.addEventListener('click', (ev) => {
+      // Speak-Button-Klicks oder Link-Klicks nicht als Reveal werten
+      if (ev.target.closest('.speak-btn') || ev.target.closest('.answer-link')) return;
+      revealAnswer();
+    });
+    triviaA._handlerAttached = true;
+  }
   shuffleTrivia();
   document.querySelectorAll('.cat-filter button').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2355,6 +2594,475 @@ async function renderMap() {
       <div class="players">${c.players.map(p => p.name.split(' ').pop()).join(' · ')}</div>
     </div>
   `).join('');
+}
+
+// ============================================================
+// WM-TABELLE (openfootball API)
+// ============================================================
+const WM_DATA_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
+let wmData = null;
+let wmLastLoad = 0;
+let currentWmGroup = "all";
+
+const FLAG_MAP = {
+  "Germany": "🇩🇪", "Curacao": "🇨🇼", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Côte d'Ivoire": "🇨🇮",
+  "Ecuador": "🇪🇨", "Mexico": "🇲🇽", "USA": "🇺🇸", "United States": "🇺🇸", "Canada": "🇨🇦",
+  "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czech Republic": "🇨🇿", "France": "🇫🇷",
+  "Spain": "🇪🇸", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "Portugal": "🇵🇹",
+  "Italy": "🇮🇹", "Netherlands": "🇳🇱", "Belgium": "🇧🇪", "Switzerland": "🇨🇭", "Austria": "🇦🇹",
+  "Denmark": "🇩🇰", "Norway": "🇳🇴", "Sweden": "🇸🇪", "Poland": "🇵🇱", "Croatia": "🇭🇷",
+  "Serbia": "🇷🇸", "Turkey": "🇹🇷", "Türkiye": "🇹🇷", "Japan": "🇯🇵", "Australia": "🇦🇺",
+  "Iran": "🇮🇷", "Saudi Arabia": "🇸🇦", "Qatar": "🇶🇦", "Morocco": "🇲🇦", "Tunisia": "🇹🇳",
+  "Algeria": "🇩🇿", "Egypt": "🇪🇬", "Senegal": "🇸🇳", "Ghana": "🇬🇭", "Nigeria": "🇳🇬",
+  "Cameroon": "🇨🇲", "Uruguay": "🇺🇾", "Colombia": "🇨🇴", "Peru": "🇵🇪", "Chile": "🇨🇱",
+  "Paraguay": "🇵🇾", "Bolivia": "🇧🇴", "Venezuela": "🇻🇪", "Panama": "🇵🇦", "Costa Rica": "🇨🇷",
+  "Honduras": "🇭🇳", "Jamaica": "🇯🇲", "New Zealand": "🇳🇿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "Republic of Ireland": "🇮🇪", "Ireland": "🇮🇪", "Ukraine": "🇺🇦", "Russia": "🇷🇺",
+  "Cape Verde": "🇨🇻", "Uzbekistan": "🇺🇿", "Jordan": "🇯🇴",
+};
+function flagFor(team) {
+  return FLAG_MAP[team] || "🏳️";
+}
+
+async function loadWMData(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && wmData && (now - wmLastLoad) < 5 * 60 * 1000) {
+    renderWMGroups();
+    return;
+  }
+  const groupsEl = document.getElementById('wmGroups');
+  if (groupsEl) groupsEl.innerHTML = '<div class="wm-loading">Lade aktuelle Daten von openfootball …</div>';
+  try {
+    const r = await fetch(WM_DATA_URL + "?t=" + Math.floor(now / 60000));
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    wmData = await r.json();
+    wmLastLoad = now;
+    const lastUpd = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const upd = document.getElementById('wmUpdated');
+    if (upd) upd.textContent = `Aktualisiert ${lastUpd}`;
+    renderWMGroups();
+  } catch (e) {
+    if (groupsEl) groupsEl.innerHTML = `<div class="wm-loading">Konnte Daten nicht laden: ${e.message}</div>`;
+  }
+}
+
+function computeStandings(matches) {
+  const teams = {};
+  matches.forEach(m => {
+    if (!teams[m.team1]) teams[m.team1] = { name: m.team1, pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+    if (!teams[m.team2]) teams[m.team2] = { name: m.team2, pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+    if (m.score && m.score.ft && m.score.ft.length === 2) {
+      const [g1, g2] = m.score.ft;
+      teams[m.team1].pl++; teams[m.team1].gf += g1; teams[m.team1].ga += g2;
+      teams[m.team2].pl++; teams[m.team2].gf += g2; teams[m.team2].ga += g1;
+      if (g1 > g2) { teams[m.team1].w++; teams[m.team1].pts += 3; teams[m.team2].l++; }
+      else if (g1 < g2) { teams[m.team2].w++; teams[m.team2].pts += 3; teams[m.team1].l++; }
+      else { teams[m.team1].d++; teams[m.team2].d++; teams[m.team1].pts++; teams[m.team2].pts++; }
+    }
+  });
+  const arr = Object.values(teams);
+  arr.sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.name.localeCompare(b.name));
+  return arr;
+}
+
+function matchStatus(m) {
+  if (m.score && m.score.ft && m.score.ft.length === 2) return 'finished';
+  if (m.score && m.score.ht) return 'live';
+  const t = parseMatchTime(m);
+  if (t && Date.now() > t && Date.now() < t + 2 * 60 * 60 * 1000) return 'live';
+  return 'pending';
+}
+
+function parseMatchTime(m) {
+  // openfootball: date "2026-06-14", time "13:00 UTC-6" or similar
+  if (!m.date || !m.time) return null;
+  try {
+    const tzMatch = m.time.match(/(\d{1,2}):(\d{2})\s*UTC([+-]\d{1,2})?/);
+    if (!tzMatch) return null;
+    const [, h, mn, tz] = tzMatch;
+    const tzOffsetHr = tz ? parseInt(tz) : 0;
+    const [y, mo, d] = m.date.split('-').map(Number);
+    // Build a UTC timestamp from local-tz value
+    const localMs = Date.UTC(y, mo - 1, d, parseInt(h) - tzOffsetHr, parseInt(mn));
+    return localMs;
+  } catch (e) { return null; }
+}
+
+function fmtMatchTimeLocal(m) {
+  const t = parseMatchTime(m);
+  if (!t) return m.date;
+  const d = new Date(t);
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' · ' +
+    d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderWMGroups() {
+  if (!wmData) return;
+  const allMatches = wmData.matches || [];
+  // Group by group name
+  const groups = {};
+  allMatches.forEach(m => {
+    if (!m.group) return;
+    if (!groups[m.group]) groups[m.group] = [];
+    groups[m.group].push(m);
+  });
+  const groupNames = Object.keys(groups).sort();
+  const filterChips = document.querySelector('.wm-controls');
+  // Add group chips dynamically (once)
+  if (filterChips && !filterChips.dataset.chipsAdded) {
+    const refreshBtn = document.getElementById('wmRefresh');
+    groupNames.forEach(name => {
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.dataset.grp = name;
+      chip.textContent = name.replace('Group ', 'Gr. ');
+      chip.addEventListener('click', () => {
+        currentWmGroup = name;
+        document.querySelectorAll('.wm-controls .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        renderWMGroups();
+      });
+      filterChips.insertBefore(chip, refreshBtn);
+    });
+    document.getElementById('wmGrpAll').addEventListener('click', () => {
+      currentWmGroup = 'all';
+      document.querySelectorAll('.wm-controls .chip').forEach(c => c.classList.remove('active'));
+      document.getElementById('wmGrpAll').classList.add('active');
+      renderWMGroups();
+    });
+    filterChips.dataset.chipsAdded = '1';
+  }
+  // Render groups
+  let html = '';
+  const shown = currentWmGroup === 'all' ? groupNames : [currentWmGroup];
+  shown.forEach(name => {
+    const matches = groups[name];
+    const standings = computeStandings(matches);
+    const hasDEU = standings.some(t => t.name === 'Germany');
+    html += `<div class="wm-group ${hasDEU ? 'highlight' : ''}">
+      <div class="wm-group-title">
+        ${name} ${hasDEU ? '<span class="deu-tag">🇩🇪 DEUTSCHLAND</span>' : ''}
+      </div>
+      <table class="wm-table">
+        <tr><th class="num">#</th><th>Team</th><th>Sp</th><th>T</th><th>±</th><th class="pts">Pkt</th></tr>
+        ${standings.map((t, i) => `
+          <tr class="${i < 2 ? 'advances' : ''} ${t.name === 'Germany' ? 'deu' : ''}">
+            <td class="num">${i + 1}</td>
+            <td><span class="team-flag">${flagFor(t.name)}</span><span class="team">${germanTeam(t.name)}</span></td>
+            <td>${t.pl}</td>
+            <td>${t.gf}:${t.ga}</td>
+            <td>${t.gf - t.ga > 0 ? '+' : ''}${t.gf - t.ga}</td>
+            <td class="pts">${t.pts}</td>
+          </tr>
+        `).join('')}
+      </table>
+      <div class="wm-matches">
+        ${matches.sort((a, b) => (parseMatchTime(a) || 0) - (parseMatchTime(b) || 0)).map((m, idx) => {
+          const status = matchStatus(m);
+          let scoreText;
+          if (status === 'finished') {
+            scoreText = `${m.score.ft[0]} : ${m.score.ft[1]}`;
+          } else if (status === 'live') {
+            const cur = m.score && m.score.ht ? `${m.score.ht[0]}:${m.score.ht[1]} HZ` : 'LIVE';
+            scoreText = cur;
+          } else {
+            scoreText = fmtMatchTimeLocal(m).split(' · ')[1] || '–:–';
+          }
+          // Identify match index in global array for click
+          const globalIdx = allMatches.indexOf(m);
+          return `<div class="wm-match ${status}" onclick="openMatchDetail(${globalIdx})">
+            <div class="home"><span class="team-flag">${flagFor(m.team1)}</span>${germanTeam(m.team1)}</div>
+            <div class="score">${scoreText}</div>
+            <div class="away">${germanTeam(m.team2)}<span class="team-flag" style="margin-left:6px;margin-right:0;">${flagFor(m.team2)}</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('wmGroups').innerHTML = html;
+}
+
+const TEAM_DE = {
+  "Germany": "Deutschland", "Curacao": "Curaçao", "Ivory Coast": "Elfenbeinküste",
+  "Côte d'Ivoire": "Elfenbeinküste", "Ecuador": "Ecuador",
+  "South Africa": "Südafrika", "South Korea": "Südkorea", "Czech Republic": "Tschechien",
+  "France": "Frankreich", "Spain": "Spanien", "England": "England", "Italy": "Italien",
+  "Netherlands": "Niederlande", "Belgium": "Belgien", "Switzerland": "Schweiz",
+  "Austria": "Österreich", "Denmark": "Dänemark", "Norway": "Norwegen", "Sweden": "Schweden",
+  "Poland": "Polen", "Croatia": "Kroatien", "Serbia": "Serbien", "Turkey": "Türkei",
+  "Türkiye": "Türkei", "Japan": "Japan", "Australia": "Australien", "Iran": "Iran",
+  "Saudi Arabia": "Saudi-Arabien", "Qatar": "Katar", "Morocco": "Marokko",
+  "Tunisia": "Tunesien", "Algeria": "Algerien", "Egypt": "Ägypten", "Senegal": "Senegal",
+  "Ghana": "Ghana", "Nigeria": "Nigeria", "Cameroon": "Kamerun", "Uruguay": "Uruguay",
+  "Colombia": "Kolumbien", "Peru": "Peru", "Chile": "Chile", "Paraguay": "Paraguay",
+  "Mexico": "Mexiko", "USA": "USA", "United States": "USA", "Canada": "Kanada",
+  "Argentina": "Argentinien", "Brazil": "Brasilien", "Portugal": "Portugal",
+  "New Zealand": "Neuseeland", "Cape Verde": "Kap Verde", "Republic of Ireland": "Irland",
+  "Wales": "Wales", "Scotland": "Schottland", "Ukraine": "Ukraine",
+  "Jamaica": "Jamaika", "Costa Rica": "Costa Rica", "Panama": "Panama",
+  "Honduras": "Honduras", "Uzbekistan": "Usbekistan", "Jordan": "Jordanien",
+};
+function germanTeam(name) { return TEAM_DE[name] || name; }
+
+function openMatchDetail(matchIdx) {
+  if (!wmData) return;
+  const m = wmData.matches[matchIdx];
+  if (!m) return;
+  const status = matchStatus(m);
+  let scoreHtml;
+  if (status === 'finished') {
+    scoreHtml = `<div class="big-score">${m.score.ft[0]} : ${m.score.ft[1]}</div>`;
+    if (m.score.ht) scoreHtml += `<div class="meta">Halbzeit ${m.score.ht[0]}:${m.score.ht[1]}</div>`;
+  } else if (status === 'live') {
+    scoreHtml = `<div class="big-score">${m.score?.ht?.[0] ?? '–'} : ${m.score?.ht?.[1] ?? '–'}</div><div class="meta">LIVE</div>`;
+  } else {
+    scoreHtml = `<div class="big-score" style="font-size:24px;">${fmtMatchTimeLocal(m).split(' · ')[1] || ''}</div><div class="meta">${fmtMatchTimeLocal(m).split(' · ')[0]} · noch nicht angepfiffen</div>`;
+  }
+  let goalsHtml = '';
+  if (m.goals1 && m.goals1.length) {
+    goalsHtml += `<div class="scorers"><h4>${germanTeam(m.team1)}</h4><div class="scorer-list">${m.goals1.map(g => `<div>${g.name} (${g.minute}.)</div>`).join('')}</div></div>`;
+  }
+  if (m.goals2 && m.goals2.length) {
+    goalsHtml += `<div class="scorers"><h4>${germanTeam(m.team2)}</h4><div class="scorer-list">${m.goals2.map(g => `<div>${g.name} (${g.minute}.)</div>`).join('')}</div></div>`;
+  }
+  document.getElementById('modalPlayerTitle').textContent = `${germanTeam(m.team1)} vs. ${germanTeam(m.team2)}`;
+  document.getElementById('modalPlayerBody').innerHTML = `
+    <div class="match-detail">
+      <div class="ko-header">
+        <div class="teams">${flagFor(m.team1)} ${germanTeam(m.team1)} – ${germanTeam(m.team2)} ${flagFor(m.team2)}</div>
+        ${scoreHtml}
+        <div class="meta">${m.ground || ''} · ${m.group || m.round || ''}</div>
+      </div>
+      ${goalsHtml || '<div style="text-align:center;color:var(--muted);font-size:13px;padding:14px;">Noch keine Torschützen-Daten</div>'}
+      ${status === 'finished' ? `<div class="news-actions" style="margin-top:14px;">${speakBtn(`Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} endete ${m.score.ft[0]} zu ${m.score.ft[1]}. ${(m.goals1||[]).map(g=>g.name+' für '+germanTeam(m.team1)+' in Minute '+g.minute).join('. ')}. ${(m.goals2||[]).map(g=>g.name+' für '+germanTeam(m.team2)+' in Minute '+g.minute).join('. ')}.`, 'Bericht vorlesen')}</div>` : ''}
+    </div>
+  `;
+  openModal('modalPlayer');
+}
+window.openMatchDetail = openMatchDetail;
+window.loadWMData = loadWMData;
+
+// ============================================================
+// SCHÄTZEN
+// ============================================================
+const GUESS_QUESTIONS = [
+  { q: "Wie alt ist der älteste Spieler im DFB-Kader (Manuel Neuer)?", a: 40, unit: "Jahre", explain: "Manuel Neuer ist 40 – damit der älteste, fast doppelt so alt wie sein jüngster Mitspieler Assan Ouédraogo (20)." },
+  { q: "Was verdient Manuel Neuer pro Jahr beim FC Bayern (in Mio. €)?", a: 21, unit: "Mio. €", explain: "21 Mio. € brutto. Damit ist er der Top-Verdiener im DFB-Kader." },
+  { q: "Wie viele Spieler aus dem DFB-Kader spielen beim FC Bayern München?", a: 6, unit: "Spieler", explain: "Neuer, Tah, Pavlović, Kimmich, Goretzka, Musiala. Fast ein Viertel des ganzen Kaders." },
+  { q: "Wie viele Spieler im Kader spielen normalerweise im Ausland?", a: 7, unit: "Spieler", explain: "5 in England (Havertz, Groß, Wirtz, Woltemade, Thiaw), 1 in Spanien (Rüdiger), 1 in der Türkei (Sané)." },
+  { q: "Wie viele WM-Titel hat Deutschland insgesamt schon geholt?", a: 4, unit: "Sterne", explain: "1954 (Bern), 1974, 1990 und 2014 (Brasilien). Sterne über dem DFB-Logo." },
+  { q: "Wie viele Mannschaften nehmen erstmals an der WM 2026 teil (statt 32)?", a: 48, unit: "Mannschaften", explain: "Erstmals 48 Teams. Plus: drei Gastgeberländer (USA, Kanada, Mexiko)." },
+  { q: "Wie viele Tore hat Deutschland in den letzten 5 Vorbereitungsspielen geschossen?", a: 18, unit: "Tore", explain: "18 Tore in 5 Siegen: 2:1 vs USA, 4:0 vs Finnland, 2:1 vs Ghana, 4:3 vs Schweiz, 6:0 vs Slowakei." },
+  { q: "Wie viele Jahre ist Bundestrainer Nagelsmann alt?", a: 38, unit: "Jahre", explain: "Mit 38 jüngster Trainer der ganzen WM 2026 – und jünger als sein eigener Torwart Neuer (40)." },
+  { q: "Wie hoch ist die Tipico-Quote auf einen deutschen Sieg gegen Curaçao?", a: 1.04, unit: "", explain: "1,04 – also fast schon ein Pflichtsieg. Bei 100 € Einsatz gäbe es nur 4 € Gewinn." },
+  { q: "Wie viele Spiele werden insgesamt bei der WM 2026 ausgetragen?", a: 104, unit: "Spiele", explain: "104 Spiele in 39 Tagen vom 11. Juni bis 19. Juli 2026." },
+  { q: "Wie groß ist Nick Woltemade (in cm)?", a: 198, unit: "cm", explain: "Mit 1,98 m ist Woltemade der längste Spieler im Kader. Spielt bei Newcastle United." },
+  { q: "Wie viele Jahre alt war Nagelsmann, als er Bundesliga-Trainer wurde (jüngster aller Zeiten)?", a: 28, unit: "Jahre", explain: "Hoffenheim 2016 – mit 28 wurde er jüngster Bundesliga-Trainer aller Zeiten." },
+  { q: "In wie vielen US/Kanada/Mexiko-Stadien wird die WM 2026 gespielt?", a: 16, unit: "Stadien", explain: "16 Spielorte: 11 in den USA, 3 in Mexiko, 2 in Kanada." },
+  { q: "Wie viele Bundesliga-Vereine stellen Spieler für den DFB-Kader?", a: 7, unit: "Vereine", explain: "Bayern, Dortmund, Stuttgart, Leipzig, Hoffenheim, Mainz, Frankfurt." },
+  { q: "Wie viele Tore hat Deutschland 2014 im WM-Halbfinale gegen Brasilien geschossen?", a: 7, unit: "Tore", explain: "Das berühmte 7:1 im Halbfinale. Eines der historischsten Spiele aller Zeiten." },
+  { q: "Wie viel verdient Musiala umgerechnet pro Tag (in Tausend €)?", a: 57, unit: "tausend €/Tag", explain: "20,75 Mio. € / 365 Tage ≈ 57.000 € pro Tag. Pro Stunde wären das ca. 2.370 €." },
+  { q: "Wie viele Spiele hat Curaçao überhaupt schon bei einer WM bestritten (vor 2026)?", a: 0, unit: "Spiele", explain: "Curaçao ist 2026 zum ersten Mal überhaupt bei einer WM dabei. Inselstaat mit nur ~150.000 Einwohnern." },
+  { q: "Wie viele Jahre Vertrag hat Florian Wirtz beim FC Liverpool (Vertragslänge in Jahren)?", a: 5, unit: "Jahre", explain: "Vertrag bis 2030, unterschrieben 2025 – also 5 Jahre. Mit Rekordablöse von Leverkusen geholt." },
+  { q: "Wie viele Punkte gibt es im Tippspiel für ein exakt richtiges Ergebnis?", a: 4, unit: "Punkte", explain: "4 für exakt · 3 für richtige Tordifferenz · 2 für richtigen Sieger · 0 für falsch." },
+  { q: "Wie viele Spieler aus England (Premier League) sind im DFB-Kader?", a: 5, unit: "Spieler", explain: "Havertz (Arsenal), Groß (Brighton), Wirtz (Liverpool), Woltemade & Thiaw (Newcastle)." },
+];
+
+let guessState = {
+  phase: 'setup',  // setup | play | reveal | final
+  players: [],
+  scores: {},
+  currentRound: 0,
+  totalRounds: 5,
+  currentPlayerIdx: 0,
+  questions: [],
+  guesses: {}, // { playerName: number } for current question
+};
+
+function startGuessSetup() {
+  guessState = {
+    phase: 'setup',
+    players: JSON.parse(localStorage.getItem('wm2026_guess_players') || '["Florian","Janet"]'),
+    scores: {},
+    currentRound: 0,
+    totalRounds: 5,
+    currentPlayerIdx: 0,
+    questions: [],
+    guesses: {},
+  };
+  renderGuess();
+}
+
+function renderGuess() {
+  const shell = document.getElementById('guessShell');
+  if (guessState.phase === 'setup') {
+    shell.innerHTML = `
+      <div class="guess-setup">
+        <h3>Wer spielt mit?</h3>
+        <p class="lead-sm">Tragt eure Namen ein (mindestens 2). Das Spiel läuft über 5 Runden im Pass-the-Phone-Modus.</p>
+        <div class="guess-names" id="guessNames"></div>
+        <button class="chip" onclick="addGuessName()" style="background:var(--card-2);">+ Spieler hinzufügen</button>
+        <button class="guess-start" id="guessStartBtn" onclick="startGuessGame()">Spiel starten</button>
+      </div>
+    `;
+    renderGuessNames();
+  } else if (guessState.phase === 'play') {
+    renderGuessPlay();
+  } else if (guessState.phase === 'reveal') {
+    renderGuessReveal();
+  } else if (guessState.phase === 'final') {
+    renderGuessFinal();
+  }
+}
+
+function renderGuessNames() {
+  const cont = document.getElementById('guessNames');
+  if (!cont) return;
+  cont.innerHTML = guessState.players.map((n, i) => `
+    <div class="guess-name-row">
+      <input type="text" value="${escapeHtml(n)}" maxlength="20" onchange="updateGuessName(${i}, this.value)" placeholder="Name">
+      ${guessState.players.length > 2 ? `<button onclick="removeGuessName(${i})">×</button>` : ''}
+    </div>
+  `).join('');
+}
+function addGuessName() {
+  guessState.players.push('');
+  renderGuessNames();
+}
+function removeGuessName(idx) {
+  guessState.players.splice(idx, 1);
+  renderGuessNames();
+}
+function updateGuessName(idx, val) {
+  guessState.players[idx] = val;
+}
+
+function startGuessGame() {
+  const cleanNames = guessState.players.map(n => n.trim()).filter(Boolean);
+  if (cleanNames.length < 2) { alert('Mindestens 2 Spieler nötig!'); return; }
+  guessState.players = cleanNames;
+  localStorage.setItem('wm2026_guess_players', JSON.stringify(cleanNames));
+  cleanNames.forEach(n => guessState.scores[n] = 0);
+  guessState.questions = [...GUESS_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, guessState.totalRounds);
+  guessState.currentRound = 0;
+  guessState.currentPlayerIdx = 0;
+  guessState.guesses = {};
+  guessState.phase = 'play';
+  renderGuess();
+}
+window.startGuessSetup = startGuessSetup;
+window.startGuessGame = startGuessGame;
+window.addGuessName = addGuessName;
+window.removeGuessName = removeGuessName;
+window.updateGuessName = updateGuessName;
+
+function renderGuessPlay() {
+  const shell = document.getElementById('guessShell');
+  const q = guessState.questions[guessState.currentRound];
+  const player = guessState.players[guessState.currentPlayerIdx];
+  shell.innerHTML = `
+    <div class="guess-play">
+      <div class="q-meta">Runde ${guessState.currentRound + 1} / ${guessState.totalRounds}</div>
+      <div class="question">${q.q}</div>
+      <div class="turn">Jetzt dran: <span>${escapeHtml(player)}</span></div>
+      <div class="input-row">
+        <input type="number" id="guessInput" inputmode="decimal" step="0.01" placeholder="Schätzung" autofocus>
+        <button onclick="submitGuess()">Tipp ab</button>
+      </div>
+      <div class="lead-sm" style="text-align:center;font-size:11px;">Tipp eingeben, dann das Handy weiterreichen.</div>
+    </div>
+  `;
+  setTimeout(() => {
+    const inp = document.getElementById('guessInput');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function submitGuess() {
+  const val = parseFloat(document.getElementById('guessInput').value);
+  if (isNaN(val)) { alert('Bitte eine Zahl eintippen!'); return; }
+  const player = guessState.players[guessState.currentPlayerIdx];
+  guessState.guesses[player] = val;
+  guessState.currentPlayerIdx++;
+  if (guessState.currentPlayerIdx >= guessState.players.length) {
+    guessState.phase = 'reveal';
+  }
+  renderGuess();
+}
+window.submitGuess = submitGuess;
+
+function renderGuessReveal() {
+  const shell = document.getElementById('guessShell');
+  const q = guessState.questions[guessState.currentRound];
+  // Score for each player: closer = more points
+  // Sorted by abs distance, points: 4-3-2-1, then 0
+  const distances = guessState.players.map(p => ({
+    name: p, guess: guessState.guesses[p], dist: Math.abs(guessState.guesses[p] - q.a)
+  })).sort((a, b) => a.dist - b.dist);
+  const POINTS = [5, 3, 2, 1];
+  distances.forEach((d, i) => {
+    d.points = i < POINTS.length ? POINTS[i] : 0;
+    guessState.scores[d.name] = (guessState.scores[d.name] || 0) + d.points;
+  });
+  fireConfetti();
+  shell.innerHTML = `
+    <div class="guess-reveal">
+      <div class="q-meta">Runde ${guessState.currentRound + 1} / ${guessState.totalRounds}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">${q.q}</div>
+      <div class="answer-num">${q.a}</div>
+      <div class="answer-unit">${q.unit}</div>
+      <div class="explain">${q.explain}</div>
+    </div>
+    <div class="guess-results" style="margin-top:14px;">
+      ${distances.map((d, i) => `
+        <div class="guess-result-row ${i === 0 ? 'winner' : ''}">
+          <div class="nm">${i === 0 ? '🥇 ' : ''}${escapeHtml(d.name)}</div>
+          <div class="gs">tippte ${d.guess}</div>
+          <div class="pt">+${d.points}</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="guess-next" onclick="nextGuessRound()">${guessState.currentRound + 1 < guessState.totalRounds ? 'Nächste Runde' : 'Endergebnis sehen'}</button>
+  `;
+}
+
+function nextGuessRound() {
+  guessState.currentRound++;
+  guessState.currentPlayerIdx = 0;
+  guessState.guesses = {};
+  if (guessState.currentRound >= guessState.totalRounds) {
+    guessState.phase = 'final';
+  } else {
+    guessState.phase = 'play';
+  }
+  renderGuess();
+}
+window.nextGuessRound = nextGuessRound;
+
+function renderGuessFinal() {
+  const shell = document.getElementById('guessShell');
+  const ranked = Object.entries(guessState.scores).map(([n, s]) => ({ name: n, score: s }))
+    .sort((a, b) => b.score - a.score);
+  const winner = ranked[0];
+  shell.innerHTML = `
+    <div class="guess-final">
+      <div class="crown">👑</div>
+      <h3>${escapeHtml(winner.name)} gewinnt!</h3>
+      <p class="lead-sm">${winner.score} Punkte in ${guessState.totalRounds} Runden</p>
+      <div class="leaderboard-final">
+        ${ranked.map((p, i) => `
+          <div class="lb-row ${i < 3 ? 'rank-' + (i+1) : ''}">
+            <div class="lb-rank">${i + 1}</div>
+            <div class="lb-name">${escapeHtml(p.name)}</div>
+            <div class="lb-pred">–</div>
+            <div class="lb-pts">${p.score} Pkt.</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="guess-next" onclick="startGuessSetup()">Neue Runde starten</button>
+    </div>
+  `;
+  fireConfetti();
 }
 
 // ============================================================
