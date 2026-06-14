@@ -1,0 +1,19 @@
+{
+  "name": "DFB WM 2026",
+  "short_name": "WM 2026",
+  "description": "Interaktive Lernkarten zum DFB-Kader bei der Fußball-WM 2026",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><rect y='170' width='512' height='86' fill='%23DD0000'/><rect y='340' width='512' height='86' fill='%23FFCE00'/><text y='370' x='256' font-size='320' text-anchor='middle'>⚽</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

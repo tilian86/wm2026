@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>WM 2026 · Deutschland</title>
 <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⚽</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23000'/><text y='150' x='100' font-size='130' text-anchor='middle'>⚽</text></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DFB WM 2026">
 <style>
 :root {
   --bg: #0a0a0a;
@@ -408,6 +413,152 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   font-size: 12px; line-height: 1.5; color: var(--txt);
 }
 .live-hint b { color: var(--gold); }
+
+/* COUNTDOWN BANNER */
+.countdown-banner {
+  background: linear-gradient(135deg, #1a0a0a 0%, #3a0a0a 50%, #1a1a0a 100%);
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  overflow: hidden; position: relative;
+}
+.countdown-banner.match-day {
+  background: linear-gradient(135deg, #2a0a00, #ff5722, #2a0a00);
+  background-size: 200% 100%;
+  animation: matchDayPulse 4s ease-in-out infinite;
+}
+@keyframes matchDayPulse { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.countdown-banner.live {
+  background: linear-gradient(135deg, #1a0a00, #ff0000, #1a0a00);
+  background-size: 200% 100%;
+  animation: liveBlink 1.5s ease-in-out infinite;
+}
+@keyframes liveBlink { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.countdown-flag { font-size: 26px; flex-shrink: 0; }
+.countdown-info { flex: 1; min-width: 0; }
+.countdown-lbl {
+  font-size: 10px; color: var(--gold); font-weight: 800; letter-spacing: 1.5px;
+  margin-bottom: 2px;
+}
+.countdown-match { font-size: 13px; font-weight: 700; line-height: 1.2; }
+.countdown-match span { color: var(--muted); font-weight: 500; font-size: 11px; }
+.countdown-timer {
+  display: flex; gap: 6px; flex-shrink: 0;
+}
+.timer-unit {
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 4px 6px;
+  text-align: center;
+  min-width: 32px;
+}
+.timer-unit .num { font-size: 16px; font-weight: 900; color: var(--gold); line-height: 1; }
+.timer-unit .lbl { font-size: 8px; color: var(--muted); letter-spacing: 1px; margin-top: 1px; }
+
+/* STATS TAB */
+.stats-hero {
+  background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 22px 18px; margin-bottom: 16px;
+  text-align: center;
+}
+.stats-hero .big-num {
+  font-size: 56px; font-weight: 900; color: var(--gold);
+  line-height: 1; letter-spacing: -2px;
+}
+.stats-hero .big-lbl {
+  color: var(--muted); font-size: 12px; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-top: 8px;
+}
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px;
+}
+.stat-card .num {
+  font-size: 28px; font-weight: 900; color: var(--gold);
+  line-height: 1; letter-spacing: -1px;
+}
+.stat-card .lbl {
+  font-size: 11px; color: var(--muted); letter-spacing: 1px;
+  text-transform: uppercase; margin-top: 6px;
+}
+.stat-card .sub { font-size: 12px; color: var(--txt); margin-top: 4px; }
+
+.stat-bars { background: var(--card); border-radius: 14px; padding: 18px; border: 1px solid var(--border); margin-bottom: 14px; }
+.stat-bars h3 { font-size: 14px; margin-bottom: 14px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-row:last-child { margin-bottom: 0; }
+.bar-row .label { font-size: 13px; min-width: 90px; flex-shrink: 0; }
+.bar-row .bar {
+  flex: 1; height: 22px; background: var(--card-2); border-radius: 6px;
+  position: relative; overflow: hidden;
+}
+.bar-row .bar > div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #ffeb3b);
+  border-radius: 6px;
+  display: flex; align-items: center; padding: 0 8px;
+  font-size: 11px; font-weight: 800; color: #000;
+  transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
+}
+
+.podium {
+  display: flex; gap: 8px; align-items: flex-end;
+  background: var(--card); border-radius: 14px; padding: 18px;
+  border: 1px solid var(--border); margin-bottom: 14px;
+}
+.podium-item {
+  flex: 1; text-align: center; cursor: pointer;
+}
+.podium-rank { font-size: 14px; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+.podium-ph {
+  width: 70px; height: 70px; border-radius: 50%; margin: 0 auto;
+  object-fit: cover; object-position: center 15%; background: var(--card-2);
+}
+.podium-ph-fallback {
+  width: 70px; height: 70px; border-radius: 50%; margin: 0 auto;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 800; font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.podium-name { font-size: 12px; font-weight: 700; margin-top: 8px; line-height: 1.2; }
+.podium-val { font-size: 11px; color: var(--gold); margin-top: 2px; font-weight: 700; }
+
+/* DAILY PLAYER */
+.daily-card {
+  background: linear-gradient(135deg, rgba(255,206,0,0.15), rgba(255,206,0,0.05));
+  border: 1px solid rgba(255,206,0,0.35);
+  border-radius: 16px; padding: 16px;
+  margin-bottom: 18px;
+  display: flex; gap: 14px; align-items: center;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+}
+.daily-card::before {
+  content: ""; position: absolute; top: -30%; right: -10%;
+  width: 200px; height: 200px;
+  background: radial-gradient(var(--gold) 0%, transparent 70%); opacity: 0.1;
+}
+.daily-card .ph {
+  width: 70px; height: 70px; border-radius: 50%; object-fit: cover; object-position: center 15%;
+  flex-shrink: 0; background: var(--card-2); position: relative; z-index: 1;
+}
+.daily-card .ph-fallback {
+  width: 70px; height: 70px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold), #ffeb3b);
+  color: #000; font-weight: 800; font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.daily-card .info { flex: 1; min-width: 0; position: relative; z-index: 1; }
+.daily-card .badge {
+  font-size: 9px; font-weight: 800; color: var(--gold);
+  letter-spacing: 1.5px; margin-bottom: 4px;
+}
+.daily-card .name { font-weight: 800; font-size: 16px; line-height: 1.2; }
+.daily-card .merker { font-size: 12px; color: var(--gold); margin-top: 6px; font-weight: 600; line-height: 1.3; }
 </style>
 </head>
 <body>
@@ -422,10 +573,23 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <button class="tab active" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 Spielplan</button>
+    <button class="tab" data-view="stats">📊 Stats</button>
     <button class="tab" data-view="glossar">📖 Glossar</button>
     <button class="tab" data-view="info">ℹ️ Infos</button>
   </nav>
 </header>
+<div class="countdown-banner" id="countdownBanner">
+  <div class="countdown-flag" id="cdFlag">🇨🇼</div>
+  <div class="countdown-info">
+    <div class="countdown-lbl" id="cdLabel">NÄCHSTES SPIEL</div>
+    <div class="countdown-match" id="cdMatch">Deutschland vs. Curaçao <span>· 14.6. · 19:00 Uhr</span></div>
+  </div>
+  <div class="countdown-timer" id="cdTimer">
+    <div class="timer-unit"><div class="num" id="cdD">–</div><div class="lbl">TAG</div></div>
+    <div class="timer-unit"><div class="num" id="cdH">–</div><div class="lbl">STD</div></div>
+    <div class="timer-unit"><div class="num" id="cdM">–</div><div class="lbl">MIN</div></div>
+  </div>
+</div>
 
 <main class="content">
 
@@ -433,6 +597,9 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 <div class="view" id="live">
   <h2>🔴 Im Spiel</h2>
   <p class="lead">Du siehst gerade einen Spieler auf dem TV und willst wissen wer das ist? Trikotnummer suchen oder antippen.</p>
+
+  <!-- Spieler des Tages -->
+  <div class="daily-card" id="dailyCard"></div>
 
   <div class="live-search">
     <input type="text" id="liveSearch" placeholder="🔍 Trikotnummer oder Name eingeben …" inputmode="text" autocomplete="off">
@@ -557,6 +724,42 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <div class="info-box" style="margin-top: 24px;">
     <div class="ttl">💡 WM-MODUS 2026</div>
     <p>Erstmals <b>48 Mannschaften</b> statt 32. In jeder der 12 Gruppen gibt es 4 Teams. Die zwei Besten ziehen direkt ins Achtzehntelfinale ein, plus die 8 besten Dritten. Heißt: selbst mit einem schwachen Start kann Deutschland noch weiter.</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="view" id="stats">
+  <h2>📊 Der Kader in Zahlen</h2>
+  <p class="lead">Statistiken, die du beim Stammtisch raushauen kannst.</p>
+
+  <div class="stats-hero">
+    <div class="big-num" id="statTotalSalary">–</div>
+    <div class="big-lbl">Mio. € Jahres-Gehalt im ganzen Kader</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num" id="statAvgAge">–</div><div class="lbl">Ø Alter</div></div>
+    <div class="stat-card"><div class="num" id="statBundesliga">–</div><div class="lbl">Bundesliga-Spieler</div></div>
+    <div class="stat-card"><div class="num" id="statAusland">–</div><div class="lbl">Im Ausland</div></div>
+    <div class="stat-card"><div class="num" id="statBayern">–</div><div class="lbl">FC-Bayern-Spieler</div></div>
+  </div>
+
+  <div class="stat-bars">
+    <h3>🏟 Spieler pro Verein</h3>
+    <div id="statClubs"></div>
+  </div>
+
+  <h3 style="font-size: 14px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">💰 Top-Verdiener</h3>
+  <div class="podium" id="statPodium"></div>
+
+  <div class="stat-bars">
+    <h3>📐 Positions-Verteilung</h3>
+    <div id="statPositions"></div>
+  </div>
+
+  <div class="info-box">
+    <div class="ttl">🎉 FUN FACT</div>
+    <p id="statFunFact">…</p>
   </div>
 </div>
 
@@ -967,6 +1170,178 @@ function renderSchedule() {
 renderTop7();
 renderSchedule();
 renderLive();
+renderStats();
+renderDailyPlayer();
+startCountdown();
+
+// ============================================================
+// COUNTDOWN
+// ============================================================
+function startCountdown() {
+  const matches = [
+    { team: "Curaçao", flag: "🇨🇼", iso: "2026-06-14T19:00:00+02:00", date: "14.6. · 19:00 Uhr" },
+    { team: "Elfenbeinküste", flag: "🇨🇮", iso: "2026-06-20T22:00:00+02:00", date: "20.6. · 22:00 Uhr" },
+    { team: "Ecuador", flag: "🇪🇨", iso: "2026-06-25T22:00:00+02:00", date: "25.6. · 22:00 Uhr" }
+  ];
+  function tick() {
+    const now = new Date();
+    const upcoming = matches.find(m => new Date(m.iso).getTime() + 120*60*1000 > now.getTime());
+    const banner = document.getElementById('countdownBanner');
+    if (!upcoming) {
+      banner.style.display = 'none';
+      return;
+    }
+    const kick = new Date(upcoming.iso);
+    const ends = new Date(kick.getTime() + 120 * 60 * 1000);
+    document.getElementById('cdFlag').textContent = upcoming.flag;
+    document.getElementById('cdMatch').innerHTML = `Deutschland vs. ${upcoming.team} <span>· ${upcoming.date}</span>`;
+
+    if (now >= kick && now < ends) {
+      banner.classList.add('live'); banner.classList.remove('match-day');
+      document.getElementById('cdLabel').textContent = '🔴 LÄUFT GERADE';
+      const elapsedM = Math.floor((now - kick) / 60000);
+      document.getElementById('cdD').textContent = elapsedM;
+      document.getElementById('cdH').textContent = "'";
+      document.getElementById('cdM').textContent = "'";
+      document.querySelectorAll('.timer-unit .lbl')[0].textContent = 'MIN';
+      document.querySelectorAll('.timer-unit .lbl')[1].textContent = '';
+      document.querySelectorAll('.timer-unit .lbl')[2].textContent = '';
+    } else {
+      const diff = kick - now;
+      const days = Math.floor(diff / 86400000);
+      const hrs = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (days === 0 && hrs < 6) {
+        banner.classList.add('match-day'); banner.classList.remove('live');
+        document.getElementById('cdLabel').textContent = '⚽ HEUTE! ANPFIFF IN';
+      } else {
+        banner.classList.remove('match-day', 'live');
+        document.getElementById('cdLabel').textContent = 'NÄCHSTES SPIEL IN';
+      }
+      document.getElementById('cdD').textContent = days;
+      document.getElementById('cdH').textContent = hrs;
+      document.getElementById('cdM').textContent = mins;
+      document.querySelectorAll('.timer-unit .lbl')[0].textContent = 'TAG';
+      document.querySelectorAll('.timer-unit .lbl')[1].textContent = 'STD';
+      document.querySelectorAll('.timer-unit .lbl')[2].textContent = 'MIN';
+    }
+  }
+  tick();
+  setInterval(tick, 30000);
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function parseSalary(s) {
+  // "21,00 Mio. €" or "14,56 Mio. £"
+  const num = parseFloat(s.replace(/[€£,]/g, m => m === ',' ? '.' : '').replace(' Mio.','').replace(/\s/g,''));
+  const isGbp = s.includes('£');
+  return isGbp ? num * 1.18 : num; // grobe £→€ Konvertierung
+}
+function renderStats() {
+  const totalSalary = PLAYERS.reduce((s,p) => s + parseSalary(p.salary), 0);
+  document.getElementById('statTotalSalary').textContent = totalSalary.toFixed(1).replace('.', ',');
+
+  const avgAge = (PLAYERS.reduce((s,p) => s + p.age, 0) / PLAYERS.length).toFixed(1).replace('.', ',');
+  document.getElementById('statAvgAge').textContent = avgAge;
+
+  const bundesligaClubs = ["FC Bayern München","Borussia Dortmund","VfB Stuttgart","RB Leipzig","Eintracht Frankfurt","TSG Hoffenheim","1. FSV Mainz 05"];
+  const bundesliga = PLAYERS.filter(p => bundesligaClubs.includes(p.club)).length;
+  document.getElementById('statBundesliga').textContent = bundesliga;
+  document.getElementById('statAusland').textContent = PLAYERS.length - bundesliga;
+
+  const bayern = PLAYERS.filter(p => p.club === "FC Bayern München").length;
+  document.getElementById('statBayern').textContent = bayern;
+
+  // Clubs Balken
+  const clubCounts = {};
+  PLAYERS.forEach(p => { clubCounts[p.club] = (clubCounts[p.club] || 0) + 1; });
+  const sortedClubs = Object.entries(clubCounts).sort((a,b) => b[1] - a[1]);
+  const maxClub = sortedClubs[0][1];
+  document.getElementById('statClubs').innerHTML = sortedClubs.map(([club, n]) => `
+    <div class="bar-row">
+      <div class="label">${club.replace('FC ','').replace('Borussia ','').replace('1. FSV ','')}</div>
+      <div class="bar"><div style="width: ${(n/maxClub*100).toFixed(0)}%">${n}</div></div>
+    </div>
+  `).join('');
+
+  // Podium
+  const top3 = [...PLAYERS].sort((a,b) => parseSalary(b.salary) - parseSalary(a.salary)).slice(0, 3);
+  const podiumOrder = [top3[1], top3[0], top3[2]]; // 2., 1., 3.
+  const rankLabels = ["🥈 2.", "🥇 1.", "🥉 3."];
+  const heights = [1.05, 1.15, 0.95];
+  document.getElementById('statPodium').innerHTML = podiumOrder.map((p, i) => `
+    <div class="podium-item" onclick="openPlayerDetail(${p.nr})" style="transform: scale(${heights[i]});">
+      <div class="podium-rank">${rankLabels[i]}</div>
+      <div class="podium-ph-fallback" id="podium-${p.nr}">${p.initials}</div>
+      <div class="podium-name">${p.name.split(' ').pop()}</div>
+      <div class="podium-val">${p.salary}</div>
+    </div>
+  `).join('');
+  podiumOrder.forEach(async p => {
+    const url = await getPhoto(p.wiki);
+    if (url) {
+      const el = document.getElementById(`podium-${p.nr}`);
+      if (el) el.outerHTML = `<img class="podium-ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=podium-ph-fallback>${p.initials}</div>'">`;
+    }
+  });
+
+  // Positionen
+  const posGroups = { "Torwart": ["TW"], "Abwehr": ["IV","LV","RV"], "Mittelfeld": ["DM","ZM","OM"], "Angriff": ["LF","RF","ST"] };
+  const posCounts = {};
+  Object.entries(posGroups).forEach(([name, codes]) => {
+    posCounts[name] = PLAYERS.filter(p => p.pos.some(x => codes.includes(x)) && (codes[0] === p.pos[0] || codes.includes(p.pos[0]))).length;
+  });
+  const maxPos = Math.max(...Object.values(posCounts));
+  document.getElementById('statPositions').innerHTML = Object.entries(posCounts).map(([name, n]) => `
+    <div class="bar-row">
+      <div class="label">${name}</div>
+      <div class="bar"><div style="width: ${(n/maxPos*100).toFixed(0)}%">${n}</div></div>
+    </div>
+  `).join('');
+
+  // Fun Fact
+  const youngest = [...PLAYERS].sort((a,b) => a.age - b.age)[0];
+  const oldest = [...PLAYERS].sort((a,b) => b.age - a.age)[0];
+  const facts = [
+    `Zwischen <b>${youngest.name}</b> (${youngest.age}) und <b>${oldest.name}</b> (${oldest.age}) liegen ${oldest.age - youngest.age} Jahre Lebenserfahrung – das sind <b>fast eine ganze Spielerkarriere</b>.`,
+    `Wenn man alle Gehälter zusammenrechnet, verdient der DFB-Kader im Jahr <b>${totalSalary.toFixed(0)} Mio. €</b>. Damit könnte man <b>${Math.round(totalSalary/0.05)} Erstklässler</b> ein Jahr lang in private Sportförderung schicken.`,
+    `<b>${bayern} von 26</b> Spielern stammen vom FC Bayern – das ist <b>${(bayern/26*100).toFixed(0)}%</b> des kompletten Kaders.`,
+    `<b>${PLAYERS.length - bundesliga} Spieler</b> kicken normalerweise im Ausland (England, Spanien, Türkei). Heißt: die Bundesliga ist <b>nicht mehr die einzige Heimat</b> der Nationalmannschaft.`
+  ];
+  document.getElementById('statFunFact').innerHTML = facts[Math.floor(Math.random() * facts.length)];
+}
+
+// ============================================================
+// DAILY PLAYER
+// ============================================================
+function renderDailyPlayer() {
+  // Deterministisch nach Tag, aber rotierend
+  const today = new Date();
+  const dayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+  let hash = 0; for (let i = 0; i < dayKey.length; i++) hash = ((hash << 5) - hash) + dayKey.charCodeAt(i);
+  const idx = Math.abs(hash) % PLAYERS.length;
+  const p = PLAYERS[idx];
+
+  const card = document.getElementById('dailyCard');
+  card.innerHTML = `
+    <div class="ph-fallback" id="daily-${p.nr}">${p.initials}</div>
+    <div class="info">
+      <div class="badge">⭐ SPIELER DES TAGES</div>
+      <div class="name">${p.name}</div>
+      <div class="merker">„${p.merker}"</div>
+    </div>
+  `;
+  card.onclick = () => openPlayerDetail(p.nr);
+
+  getPhoto(p.wiki).then(url => {
+    if (url) {
+      const el = document.getElementById(`daily-${p.nr}`);
+      if (el) el.outerHTML = `<img class="ph" src="${url}" alt="${p.name}" onerror="this.outerHTML='<div class=ph-fallback>${p.initials}</div>'">`;
+    }
+  });
+}
 
 // ============================================================
 // LIVE VIEW
