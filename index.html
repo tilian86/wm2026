@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DFB WM 2026">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.31.1/dist/globe.gl.min.js"></script>
 <style>
 :root {
   --bg: #0a0a0a;
@@ -1550,7 +1552,10 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 <div class="view" id="globe">
   <h2>🌍 WM-Globus</h2>
   <p class="lead">Wo wird wann gespielt? Klicke auf einen Pin im Globus oder eine Karte unten für Details + Stream-Links.</p>
-  <div id="globeMap" style="height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--card);"></div>
+  <div id="globeMap" style="height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: radial-gradient(circle at center, #001 0%, #000 100%); position: relative;">
+    <div id="globeEl" style="width:100%;height:100%;"></div>
+    <button id="globeReset" onclick="resetGlobeView()" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(0,0,0,0.6);border:1px solid var(--gold);color:var(--gold);padding:6px 12px;border-radius:999px;font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;">🌍 Übersicht</button>
+  </div>
   <div class="globe-filter" id="globeFilter" style="margin-top: 14px;">
     <button class="active" data-fl="upcoming">⏭ Bevorstehende</button>
     <button data-fl="today">📅 Heute</button>
@@ -3698,74 +3703,139 @@ const STADIUMS = {
   "Philadelphia": { lat: 39.901, lng: -75.167, country: "🇺🇸" },
   "New York/New Jersey (East Rutherford)": { lat: 40.813, lng: -74.074, country: "🇺🇸" },
 };
-let globeMap = null;
+let globeInstance = null;
 let globeFilter = 'upcoming';
 
 async function renderGlobe() {
-  await loadLeaflet();
   if (!wmData) { await loadWMData(false); }
-  if (!globeMap) {
-    globeMap = L.map('globeMap', { zoomControl: true }).setView([40, -90], 3);
-    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap, © CARTO', maxZoom: 18,
-    }).addTo(globeMap);
-  } else {
-    globeMap.invalidateSize();
+  if (!globeInstance && typeof Globe !== 'undefined') {
+    const el = document.getElementById('globeEl');
+    globeInstance = Globe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .atmosphereColor('#FFCE00')
+      .atmosphereAltitude(0.15)
+      .pointAltitude(d => d.altitude || 0.02)
+      .pointRadius(d => d.radius || 0.5)
+      .pointColor(d => d.color || '#fff')
+      .pointResolution(8)
+      .pointLabel(d => `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:8px;border:1px solid #FFCE00;color:white;font-family:-apple-system,sans-serif;"><b style="color:#FFCE00;">${d.flag || ''} ${d.city}</b><br><span style="font-size:11px;">${d.matchCount} Spiel${d.matchCount > 1 ? 'e' : ''}</span></div>`)
+      .onPointClick(d => {
+        focusOnPin(d);
+        renderGlobeList(d.city);
+      })
+      .width(el.clientWidth)
+      .height(el.clientHeight)
+      (el);
+    // Auto-Rotation und Controls
+    const controls = globeInstance.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.4;
+    controls.enableZoom = true;
+    controls.minDistance = 200;
+    controls.maxDistance = 600;
+    // Standard-Position über Nordamerika
+    globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 0);
+    // Beim Resize
+    new ResizeObserver(() => {
+      globeInstance.width(el.clientWidth).height(el.clientHeight);
+    }).observe(el);
   }
-  // Marker pro Stadt
-  if (!globeMap._dfbAdded) {
-    Object.entries(STADIUMS).forEach(([city, info]) => {
-      const matches = (wmData?.matches || []).filter(m => m.ground === city);
-      if (!matches.length) return;
-      const hasDeu = matches.some(m => m.team1 === 'Germany' || m.team2 === 'Germany');
-      const allDone = matches.every(m => matchStatus(m) === 'finished');
-      const hasLive = matches.some(m => matchStatus(m) === 'live');
-      let cssClass = 'globe-pin';
-      if (hasDeu) cssClass += ' globe-pin-deu';
-      else if (hasLive) cssClass += ' globe-pin-live';
-      else if (allDone) cssClass += ' globe-pin-done';
-      const icon = L.divIcon({
-        className: cssClass,
-        html: `<span>${matches.length}</span>`,
-        iconSize: [22,22], iconAnchor: [11,11],
-      });
-      L.marker([info.lat, info.lng], { icon })
-        .bindPopup(`<b>${info.country} ${city}</b><br><span style="color:#666;font-size:11px;">${matches.length} Spiel${matches.length>1?'e':''}</span><ul style="margin:6px 0 0;padding-left:18px;font-size:11px;">${matches.slice(0,5).map(m=>`<li>${germanTeam(m.team1)} – ${germanTeam(m.team2)}</li>`).join('')}${matches.length>5?'<li>…</li>':''}</ul>`)
-        .addTo(globeMap);
-    });
-    globeMap._dfbAdded = true;
-  }
+  updateGlobePoints();
   renderGlobeList();
   document.querySelectorAll('#globeFilter button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('#globeFilter button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       globeFilter = btn.dataset.fl;
+      updateGlobePoints();
       renderGlobeList();
+      resetGlobeView();
     };
   });
 }
 
-function renderGlobeList() {
+function updateGlobePoints() {
+  if (!globeInstance || !wmData) return;
+  const now = Date.now();
+  const today0 = new Date(); today0.setHours(0,0,0,0);
+  const tom0 = today0.getTime() + 24*60*60*1000;
+  const points = Object.entries(STADIUMS).map(([city, info]) => {
+    let allCityMatches = (wmData.matches || []).filter(m => m.ground === city);
+    let matches = allCityMatches;
+    if (globeFilter === 'upcoming') matches = matches.filter(m => parseMatchTime(m) > now && matchStatus(m) !== 'finished');
+    else if (globeFilter === 'today') matches = matches.filter(m => { const t = parseMatchTime(m); return t >= today0.getTime() && t < tom0; });
+    else if (globeFilter === 'live') matches = matches.filter(m => matchStatus(m) === 'live');
+    else if (globeFilter === 'done') matches = matches.filter(m => matchStatus(m) === 'finished');
+    else if (globeFilter === 'dfb') matches = matches.filter(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+    if (!matches.length) return null;
+    const hasDeu = matches.some(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+    const hasLive = matches.some(m => matchStatus(m) === 'live');
+    const allDone = matches.every(m => matchStatus(m) === 'finished');
+    let color = '#fff';
+    if (hasDeu) color = '#FFCE00';
+    else if (hasLive) color = '#DD0000';
+    else if (allDone) color = '#4caf50';
+    return {
+      lat: info.lat, lng: info.lng,
+      city, flag: info.country,
+      color,
+      radius: Math.min(1.5, 0.4 + matches.length * 0.15),
+      altitude: hasDeu ? 0.06 : (hasLive ? 0.04 : 0.02),
+      matchCount: matches.length,
+    };
+  }).filter(Boolean);
+  globeInstance.pointsData(points);
+}
+
+function focusOnPin(point) {
+  if (!globeInstance) return;
+  globeInstance.controls().autoRotate = false;
+  globeInstance.pointOfView({ lat: point.lat, lng: point.lng, altitude: 0.8 }, 1500);
+}
+
+function resetGlobeView() {
+  if (!globeInstance) return;
+  globeInstance.controls().autoRotate = true;
+  globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 1500);
+}
+window.resetGlobeView = resetGlobeView;
+
+function zoomToMatch(matchIdx) {
+  const m = wmData?.matches?.[matchIdx];
+  if (!m || !m.ground) return;
+  const info = STADIUMS[m.ground];
+  if (!info) return;
+  focusOnPin({ lat: info.lat, lng: info.lng });
+}
+window.zoomToMatch = zoomToMatch;
+
+function renderGlobeList(cityFilter) {
   if (!wmData || !wmData.matches) return;
   const now = Date.now();
   const today0 = new Date(); today0.setHours(0,0,0,0);
   const tom0 = today0.getTime() + 24*60*60*1000;
   let list = wmData.matches.filter(m => parseMatchTime(m));
-  if (globeFilter === 'upcoming') list = list.filter(m => (parseMatchTime(m) > now) && matchStatus(m) !== 'finished');
-  else if (globeFilter === 'today') list = list.filter(m => { const t = parseMatchTime(m); return t >= today0.getTime() && t < tom0; });
-  else if (globeFilter === 'live') list = list.filter(m => matchStatus(m) === 'live');
-  else if (globeFilter === 'done') list = list.filter(m => matchStatus(m) === 'finished');
-  else if (globeFilter === 'dfb') list = list.filter(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+  if (cityFilter) {
+    list = list.filter(m => m.ground === cityFilter);
+  } else {
+    if (globeFilter === 'upcoming') list = list.filter(m => (parseMatchTime(m) > now) && matchStatus(m) !== 'finished');
+    else if (globeFilter === 'today') list = list.filter(m => { const t = parseMatchTime(m); return t >= today0.getTime() && t < tom0; });
+    else if (globeFilter === 'live') list = list.filter(m => matchStatus(m) === 'live');
+    else if (globeFilter === 'done') list = list.filter(m => matchStatus(m) === 'finished');
+    else if (globeFilter === 'dfb') list = list.filter(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+  }
   list.sort((a,b) => parseMatchTime(a) - parseMatchTime(b));
-  if (globeFilter === 'done') list.reverse();
-  const showCount = globeFilter === 'all' ? list.length : Math.min(list.length, 30);
+  if (globeFilter === 'done' && !cityFilter) list.reverse();
+  const showCount = (globeFilter === 'all' || cityFilter) ? list.length : Math.min(list.length, 30);
   const slice = list.slice(0, showCount);
+  const header = cityFilter ? `<div class="info-box" style="padding:10px 14px;margin-bottom:10px;"><div class="ttl">📍 ${cityFilter}</div><p style="font-size:12px;">${slice.length} Spiele an diesem Ort. <button onclick="renderGlobeList()" style="background:transparent;border:0;color:var(--gold);cursor:pointer;font-weight:700;text-decoration:underline;font-family:inherit;font-size:12px;">Alle anzeigen</button></p></div>` : '';
   if (!slice.length) {
-    document.getElementById('globeMatchList').innerHTML = '<div class="wm-loading">Keine Spiele in dieser Kategorie.</div>';
+    document.getElementById('globeMatchList').innerHTML = header + '<div class="wm-loading">Keine Spiele in dieser Kategorie.</div>';
     return;
   }
-  document.getElementById('globeMatchList').innerHTML = slice.map(m => {
+  document.getElementById('globeMatchList').innerHTML = header + slice.map(m => {
     const t = parseMatchTime(m);
     const d = new Date(t);
     const day = d.toLocaleDateString('de-DE', { day: '2-digit' });
@@ -3779,7 +3849,7 @@ function renderGlobeList() {
     if (status === 'finished') badge = `<span class="badge-mini done">${m.score.ft[0]}:${m.score.ft[1]}</span>`;
     else if (status === 'live') badge = `<span class="badge-mini live">🔴 LIVE</span>`;
     else badge = `<span class="badge-mini">${m.group ? m.group.replace('Group','Gr.') : (m.round || '')}</span>`;
-    return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="openMatchDetail(${idx})">
+    return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="zoomToMatch(${idx}); openMatchDetail(${idx})">
       <div class="when">
         <div class="dy">${day}</div>
         <div class="mo">${mo}</div>
