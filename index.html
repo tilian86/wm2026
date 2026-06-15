@@ -2409,8 +2409,10 @@ const NEWS = [
 ];
 
 function renderNews() {
-  document.getElementById('newsList').innerHTML = NEWS.map((n, i) => {
-    // Text für TTS
+  // 1. Automatische DFB-Spielberichte aus den Live-WM-Daten oben einbauen
+  const autoNews = generateAutoNews();
+  const all = [...autoNews, ...NEWS];
+  document.getElementById('newsList').innerHTML = all.map((n) => {
     const textBlock = n.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     return `
     <div class="news-card">
@@ -2421,6 +2423,69 @@ function renderNews() {
       <div class="news-actions">${speakBtn(`${n.title}. ${textBlock}`, 'Vorlesen')}</div>
     </div>
   `}).join('');
+}
+
+function generateAutoNews() {
+  if (!wmData || !wmData.matches) return [];
+  const out = [];
+  // DFB-Spiele rückwärts (neuestes zuerst)
+  const dfbMatches = wmData.matches.filter(m =>
+    m.team1 === 'Germany' || m.team2 === 'Germany'
+  ).sort((a, b) => (parseMatchTime(b) || 0) - (parseMatchTime(a) || 0));
+  dfbMatches.forEach(m => {
+    const status = matchStatus(m);
+    if (status === 'finished') {
+      const isHome = m.team1 === 'Germany';
+      const opponent = isHome ? m.team2 : m.team1;
+      const oppDe = germanTeam(opponent);
+      const oppFlag = flagFor(opponent);
+      const [g1, g2] = m.score.ft;
+      const dfbGoals = isHome ? g1 : g2;
+      const oppGoals = isHome ? g2 : g1;
+      const result = dfbGoals > oppGoals ? 'gewinnt' : dfbGoals < oppGoals ? 'verliert' : 'spielt unentschieden';
+      const emoji = dfbGoals > oppGoals ? '🎉' : dfbGoals < oppGoals ? '😞' : '🤝';
+      const dateStr = new Date(parseMatchTime(m)).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+      const scorers1 = (m.goals1 || []).map(g => `${g.name} (${g.minute}.)`).join(', ');
+      const scorers2 = (m.goals2 || []).map(g => `${g.name} (${g.minute}.)`).join(', ');
+      let body = `<p><b>${emoji} Endstand: ${dfbGoals}:${oppGoals}</b> ${isHome ? '' : '(aus deutscher Sicht)'} </p>`;
+      body += `<p>Deutschland ${result} im ${m.group ? 'Gruppen-' : ''}Spiel gegen ${oppDe} ${oppFlag} im Stadion in ${m.ground || '?'}.</p>`;
+      if (scorers1 || scorers2) {
+        body += `<p><b>Torschützen:</b></p><ul>`;
+        if (isHome && scorers1) body += `<li>🇩🇪 ${scorers1}</li>`;
+        if (!isHome && scorers2) body += `<li>🇩🇪 ${scorers2}</li>`;
+        if (isHome && scorers2) body += `<li>${oppFlag} ${scorers2}</li>`;
+        if (!isHome && scorers1) body += `<li>${oppFlag} ${scorers1}</li>`;
+        body += `</ul>`;
+      }
+      out.push({
+        type: 'post',
+        badge: `SPIELBERICHT ${dfbGoals}:${oppGoals}`,
+        title: `${emoji} Deutschland ${result} ${dfbGoals}:${oppGoals} gegen ${oppDe}`,
+        date: dateStr,
+        body,
+      });
+    } else if (status === 'live') {
+      const ht = m.score?.ht;
+      const isHome = m.team1 === 'Germany';
+      const opponent = isHome ? m.team2 : m.team1;
+      const oppDe = germanTeam(opponent);
+      let body = `<p>🔴 <b>Spiel läuft gerade.</b></p>`;
+      if (ht) {
+        const dfbHT = isHome ? ht[0] : ht[1];
+        const oppHT = isHome ? ht[1] : ht[0];
+        body += `<p>Halbzeitstand: ${dfbHT}:${oppHT}</p>`;
+      }
+      body += `<p>Wechsel in den <b>🏆 WM-Tabelle-Tab</b> für Live-Stand und Torschützen.</p>`;
+      out.push({
+        type: 'live',
+        badge: 'LIVE',
+        title: `🔴 LIVE: Deutschland vs. ${oppDe}`,
+        date: 'Gerade jetzt',
+        body,
+      });
+    }
+  });
+  return out;
 }
 
 // ============================================================
@@ -2641,6 +2706,8 @@ async function loadWMData(forceRefresh = false) {
     const upd = document.getElementById('wmUpdated');
     if (upd) upd.textContent = `Aktualisiert ${lastUpd}`;
     renderWMGroups();
+    // News mit aktuellen Spielständen neu rendern
+    if (typeof renderNews === 'function') renderNews();
   } catch (e) {
     if (groupsEl) groupsEl.innerHTML = `<div class="wm-loading">Konnte Daten nicht laden: ${e.message}</div>`;
   }
@@ -3352,7 +3419,10 @@ function initAll() {
   renderTippGame();
   renderNews();
   addSpeakButtonsToGlossary();
-  // Map und Duel werden lazy gerendert beim Tab-Wechsel
+  // WM-Daten beim Start im Hintergrund holen, damit News-Tab sofort
+  // Spielberichte hat sobald jemand auf die App kommt
+  if (typeof loadWMData === 'function') loadWMData(false).catch(() => {});
+  // Map und Duel/Guess werden lazy beim Tab-Wechsel gerendert
 }
 initAll();
 </script>
