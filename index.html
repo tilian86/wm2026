@@ -1483,14 +1483,14 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <button class="tab" data-view="bracket">🥅 Turnierbaum</button>
     <button class="tab" data-view="globe">🌍 Globus</button>
     <button class="tab" data-view="live">🔴 Live</button>
-    <button class="tab" data-view="pitch">⚽ Spielfeld</button>
+    <button class="tab" data-view="pitch">⚽ Aufstellung</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 DFB-Plan</button>
-    <button class="tab" data-view="duel">🎲 Duell</button>
-    <button class="tab" data-view="guess">💡 Schätzen</button>
+    <button class="tab" data-view="duel">🎲 Spieler-Duell</button>
+    <button class="tab" data-view="guess">💡 Schätzspiel</button>
     <button class="tab" data-view="stats">📊 Stats</button>
-    <button class="tab" data-view="trivia">🎉 Trivia</button>
-    <button class="tab" data-view="map">🗺️ Karte</button>
+    <button class="tab" data-view="trivia">🎉 Quiz</button>
+    <button class="tab" data-view="map">🗺️ Vereine</button>
     <button class="tab" data-view="glossar">📖 Glossar</button>
     <button class="tab" data-view="info">ℹ️ Infos</button>
   </nav>
@@ -1520,7 +1520,10 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 <!-- WM-TABELLE -->
 <div class="view" id="wm">
   <h2>🏆 WM 2026 – komplette Übersicht</h2>
-  <p class="lead">Alle 12 Gruppen, alle Spiele, alle Ergebnisse. Aktualisiert sich automatisch sobald die Community-Daten neu sind. Tippe auf ein Spiel für den Kurzbericht.</p>
+  <p class="lead">Alle 12 Gruppen, alle Spiele, alle Ergebnisse. Aktualisiert sich automatisch. Tippe auf ein Spiel für den Kurzbericht.</p>
+  <div class="info-box" style="padding:10px 14px;margin-bottom:14px;">
+    <p style="font-size:12px;line-height:1.55;"><b>📊 Punkte-System:</b> <b style="color:var(--green);">3 P.</b> für Sieg · <b style="color:var(--gold);">1 P.</b> für Unentschieden · <b style="color:var(--muted);">0 P.</b> bei Niederlage. <b>±</b> = Tordifferenz. Die <b style="color:var(--green);">zwei besten</b> jeder Gruppe (grün) + die 8 besten Drittplatzierten kommen ins Sechzehntelfinale.</p>
+  </div>
   <div class="wm-controls">
     <button class="chip active" data-grp="all" id="wmGrpAll">Alle Gruppen</button>
     <span id="wmUpdated" class="wm-updated">Lade …</span>
@@ -1799,12 +1802,14 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <p class="lead">Frage vorlesen, alle rumraten lassen, dann antippen für die Antwort. Macht jede WM-Party besser.</p>
 
   <div class="cat-filter" id="catFilter">
-    <button class="active" data-cat="all">Alle</button>
+    <button class="active" data-cat="all">Alle (100)</button>
     <button data-cat="💰">💰 Geld</button>
     <button data-cat="👤">👤 Karriere</button>
     <button data-cat="🌍">🌍 Vereine</button>
     <button data-cat="😜">😜 Fun</button>
     <button data-cat="🏆">🏆 Rekorde</button>
+    <button data-cat="🏟">🏟 Stadien</button>
+    <button data-cat="📜">📜 Historie</button>
   </div>
 
   <div class="trivia-shell">
@@ -2366,7 +2371,92 @@ const TRIVIA = [
   { cat:"🏆", catName:"REKORDE", q:"Wie viele <b>WM-Titel</b> hat Deutschland insgesamt?", a:"4 Sterne", sub:"1954 (Bern), 1974, 1990, 2014 (Brasilien). Sterne über dem DFB-Logo." },
   { cat:"🏆", catName:"REKORDE", q:"Wo findet die <b>WM 2026</b> statt?", a:"USA, Kanada & Mexiko", sub:"Erste Drei-Länder-WM. Erste mit 48 statt 32 Mannschaften." },
   { cat:"🏆", catName:"REKORDE", q:"Wer ist der <b>jüngste Trainer</b> der gesamten WM 2026?", a:"Julian Nagelsmann", sub:"38 Jahre. Erste WM als Bundestrainer." },
-  { cat:"🏆", catName:"REKORDE", q:"Wie heißt Deutschlands <b>Gruppe</b> bei der WM 2026?", a:"Gruppe E", sub:"Mit Curaçao, Elfenbeinküste und Ecuador. Gilt als machbare Gruppe." }
+  { cat:"🏆", catName:"REKORDE", q:"Wie heißt Deutschlands <b>Gruppe</b> bei der WM 2026?", a:"Gruppe E", sub:"Mit Curaçao, Elfenbeinküste und Ecuador. Gilt als machbare Gruppe." },
+
+  // ZUSÄTZLICHE FRAGEN
+  // GELD 💰 (+10)
+  { cat:"💰", catName:"GELD", q:"Was kostete <b>Florian Wirtz' Wechsel</b> von Leverkusen zu Liverpool?", a:"≈ 130 Mio. €", sub:"Rekord-Ablöse für einen deutschen Spieler. Vertrag bis 2030.", goto:17 },
+  { cat:"💰", catName:"GELD", q:"Was verdient Bundestrainer Nagelsmann pro Jahr beim DFB?", a:"≈ 4,9 Mio. €", sub:"Damit Top-Verdiener auf dem DFB-Gehaltszettel – mehr als 90 % aller Bundesliga-Profis." },
+  { cat:"💰", catName:"GELD", q:"Welche Prämie bekommt jeder DFB-Spieler, wenn Deutschland Weltmeister wird?", a:"400.000 €", sub:"Pro Mann. Bei 26 Spielern: über 10 Mio. € Bonus-Pott für den Titel." },
+  { cat:"💰", catName:"GELD", q:"Wie viel zahlt die FIFA dem Weltmeister-Verband 2026?", a:"≈ 42 Mio. USD", sub:"Plus separat Antrittsgeld für alle 48 Teilnehmer und Stufenbonus pro überstandener Runde." },
+  { cat:"💰", catName:"GELD", q:"Wer hat den höchsten <b>Marktwert</b> im DFB-Kader (laut Transfermarkt)?", a:"Jamal Musiala", sub:"Geschätzt ≈ 140 Mio. €. Damit teurer als Wirtz (≈ 130 Mio. €) und Sané (≈ 35 Mio. €).", goto:10 },
+  { cat:"💰", catName:"GELD", q:"Was verdient Wirtz beim FC Liverpool ungefähr pro Woche?", a:"≈ 200.000 €", sub:"Bei einem geschätzten Jahresgehalt von 12 Mio. €. Pro Trainingstag also rund 30.000 €.", goto:17 },
+  { cat:"💰", catName:"GELD", q:"Welche Marke löst Adidas ab 2027 als <b>DFB-Trikot-Hersteller</b> ab?", a:"Nike", sub:"Ende einer 70-jährigen Adidas-Ära. Nike bietet angeblich über 100 Mio. €/Jahr – doppelt so viel wie Adidas." },
+  { cat:"💰", catName:"GELD", q:"Was bekommt Curaçao ungefähr fürs WM-Antrittsgeld?", a:"≈ 10,5 Mio. USD", sub:"Selbst Vorrunden-Aus bringt 9 Mio. – für den Inselstaat mit 150.000 Einwohnern eine kleine Sensation." },
+  { cat:"💰", catName:"GELD", q:"Wer verdient pro Spielminute mehr: Kimmich oder Goretzka?", a:"Kimmich (knapp)", sub:"Kimmich ≈ 38 €/Min, Goretzka ≈ 25 €/Min (bei je 6.000 Saison-Pflichtspielminuten).", goto:6 },
+  { cat:"💰", catName:"GELD", q:"Was hat ein Logenplatz beim WM-Finale 2026 in New York gekostet?", a:"≈ 6.000 USD", sub:"Selbst die billigsten regulären Tickets fürs Finale lagen zum Verkaufsstart bei ≈ 2.000 USD. Black-Market-Preise oft das Doppelte." },
+
+  // KARRIERE 👤 (+10)
+  { cat:"👤", catName:"KARRIERE", q:"Welche zwei aktuellen DFB-Spieler haben schon die <b>Champions League</b> gewonnen?", a:"Rüdiger & Havertz", sub:"Rüdiger 2024 mit Real Madrid, Havertz 2021 mit Chelsea (er schoss das Siegtor im Finale).", goto:2 },
+  { cat:"👤", catName:"KARRIERE", q:"Wer war <b>vor Nagelsmann</b> Bundestrainer der A-Nationalmannschaft?", a:"Hansi Flick", sub:"Flick trat im September 2023 nach der 1:4-Pleite gegen Japan zurück. Nagelsmann übernahm." },
+  { cat:"👤", catName:"KARRIERE", q:"Wie viele Profi-Vereine hatte Leroy Sané bisher in seiner Karriere?", a:"4 Vereine", sub:"Schalke 04 → Manchester City → FC Bayern → Galatasaray Istanbul.", goto:19 },
+  { cat:"👤", catName:"KARRIERE", q:"Wer war Deutschlands <b>jüngster A-Nationalspieler-Debütant</b> der letzten Jahre?", a:"Jamal Musiala", sub:"Debüt mit 17 Jahren und 286 Tagen, März 2021 gegen Island. Bis dahin hielt Christoph Metzelder seit 2001 den Rekord.", goto:10 },
+  { cat:"👤", catName:"KARRIERE", q:"In welchem Verein begann Niclas Füllkrug seine Profikarriere?", a:"Werder Bremen", sub:"Trickfrage – Füllkrug ist <b>NICHT</b> im WM-Kader 2026 (verletzt). Wir merken's uns aber für nächste Trivia." },
+  { cat:"👤", catName:"KARRIERE", q:"Wie viele Bundesliga-Spiele bestritt Manuel Neuer <b>vor 2026</b> insgesamt?", a:"≈ 500 Spiele", sub:"Etwa 80 für Schalke + 420 für Bayern. Macht ihn zu einem der spielerfahrensten Torhüter aller Zeiten in der Liga.", goto:1 },
+  { cat:"👤", catName:"KARRIERE", q:"Welcher DFB-Spieler ist beim Verein <b>Galatasaray Istanbul</b> aktiv?", a:"Leroy Sané", sub:"Wechselte 2025 von Bayern zu Gala – kontroverser Move, aber dort mit Top-Stats.", goto:19 },
+  { cat:"👤", catName:"KARRIERE", q:"Welcher Stürmer war U17-Weltmeister 2023 mit Deutschland?", a:"Assan Ouédraogo", sub:"Damals bei Schalke 04. Heute bei RB Leipzig, gerade in den WM-Kader 2026 nachgerückt.", goto:25 },
+  { cat:"👤", catName:"KARRIERE", q:"Wer war 2014 <b>WM-Kapitän</b> der deutschen Mannschaft?", a:"Philipp Lahm", sub:"Hob den Pokal im Maracanã hoch. Trat direkt nach dem Titel aus der Nationalmannschaft zurück." },
+  { cat:"👤", catName:"KARRIERE", q:"Wie alt war Mario Götze, als er das Finale 2014 entschied?", a:"22 Jahre", sub:"In der 113. Minute nach Vorlage von André Schürrle. Hatte erst kurz vorher eingewechselt." },
+
+  // VEREINE 🌍 (+10)
+  { cat:"🌍", catName:"VEREINE", q:"Wie viele Champions-League-Titel hat der FC Bayern bislang gewonnen?", a:"6 Titel", sub:"1974, 1975, 1976, 2001, 2013 und 2020. Aktueller Sieger 2025: PSG." },
+  { cat:"🌍", catName:"VEREINE", q:"Wie viele CL-Titel hat Real Madrid aktuell?", a:"15 Titel", sub:"Rekordsieger mit großem Abstand. Letzter Sieg: 2024 gegen Dortmund." },
+  { cat:"🌍", catName:"VEREINE", q:"Wer trainiert aktuell den <b>FC Bayern München</b>?", a:"Vincent Kompany", sub:"Übernahm 2024 nach Tuchel. Ex-Belgien-Star, vorher kurz bei Burnley." },
+  { cat:"🌍", catName:"VEREINE", q:"Wer ist aktueller Trainer von <b>Borussia Dortmund</b>?", a:"Niko Kovač", sub:"Übernahm Anfang 2025 als BVB-Notlösung. Hat den Verein wieder stabilisiert." },
+  { cat:"🌍", catName:"VEREINE", q:"Welcher DFB-Spieler spielt beim <b>FC Arsenal</b>?", a:"Kai Havertz", sub:"Seit 2023, wo er von Chelsea kam. Spielt dort meist als Mittelstürmer oder hängende Spitze.", goto:7 },
+  { cat:"🌍", catName:"VEREINE", q:"Wer ist der <b>einzige DFB-Spieler in Spanien</b>?", a:"Antonio Rüdiger", sub:"Real Madrid seit 2022 (ablösefrei von Chelsea). Pokalsammler.", goto:2 },
+  { cat:"🌍", catName:"VEREINE", q:"Wie viele DFB-Spieler kommen vom <b>VfB Stuttgart</b>?", a:"4 Spieler", sub:"Leweling, Stiller, Nübel, Undav. Stuttgart unter Hoeneß ist gerade die Talentschmiede." },
+  { cat:"🌍", catName:"VEREINE", q:"Wann wurde Borussia Dortmund zuletzt <b>Deutscher Meister</b>?", a:"2012", sub:"Unter Jürgen Klopp. Danach 14 Jahre Bayern-Dominanz (Stand 2026)." },
+  { cat:"🌍", catName:"VEREINE", q:"Welcher Bundesligist stellt mit <b>1 Spieler</b> den kleinsten Kader-Anteil?", a:"TSG Hoffenheim", sub:"Nur Oliver Baumann ist dabei. Mainz und Frankfurt jeweils auch nur einen (Amiri, Brown)." },
+  { cat:"🌍", catName:"VEREINE", q:"Welches deutsche Team gewann zuletzt die Champions League?", a:"FC Bayern 2020", sub:"In der Corona-Final-Acht-Saison ohne Zuschauer in Lissabon, 1:0 gegen PSG durch Coman." },
+
+  // FUN 😜 (+10)
+  { cat:"😜", catName:"FUN", q:"Wie heißt das <b>Maskottchen</b> von Kanada bei der WM 2026?", a:"Maple (der Elch)", sub:"Mexiko hat Zayu (Jaguar), USA Clutch (Weißkopfseeadler). Drei Maskottchen für drei Gastgeber." },
+  { cat:"😜", catName:"FUN", q:"Wie viele Einwohner hat <b>Curaçao</b> (Deutschlands erster Gegner)?", a:"≈ 150.000", sub:"Damit ist Curaçao der <b>kleinste Staat</b>, der je bei einer WM mitspielen durfte." },
+  { cat:"😜", catName:"FUN", q:"Welcher Spieler hat den Spitznamen „<b>Ruhige Wand</b>\"?", a:"Jonathan Tah", sub:"Innenverteidiger beim FC Bayern. Schließt Räume ohne Grätsche oder Theater.", goto:4 },
+  { cat:"😜", catName:"FUN", q:"Welche Hauptstadt hat das Land <b>Curaçao</b>?", a:"Willemstad", sub:"Bunte Karibik-Hafenstadt mit niederländischen Kolonialbauten – UNESCO-Welterbe." },
+  { cat:"😜", catName:"FUN", q:"Was bedeutet die Abkürzung <b>FIFA</b> ausgeschrieben?", a:"Fédération Internationale de Football Association", sub:"Französisch. Gegründet 1904 in Paris von 7 europäischen Verbänden." },
+  { cat:"😜", catName:"FUN", q:"In welcher Sprache wird in <b>Curaçao</b> hauptsächlich gesprochen?", a:"Niederländisch & Papiamentu", sub:"Papiamentu ist eine Kreolsprache aus Portugiesisch, Spanisch, Niederländisch, Englisch und afrikanischen Sprachen." },
+  { cat:"😜", catName:"FUN", q:"Welcher DFB-Star hat <b>burkinische Wurzeln</b>?", a:"Assan Ouédraogo", sub:"Eltern stammen aus Burkina Faso. In Mülheim an der Ruhr geboren.", goto:25 },
+  { cat:"😜", catName:"FUN", q:"Wie heißt das Stadion, in dem das <b>WM-Finale 2026</b> ausgetragen wird?", a:"MetLife Stadium", sub:"East Rutherford, New Jersey. Heimat der NFL-Teams Giants und Jets. 82.500 Plätze." },
+  { cat:"😜", catName:"FUN", q:"Wer von den DFB-Spielern hat einen <b>Bruder</b>, der auch DFB-Profi war?", a:"Felix Nmecha", sub:"Sein Bruder Lukas Nmecha (VfL Wolfsburg) spielte 2022 ebenfalls für Deutschland.", goto:23 },
+  { cat:"😜", catName:"FUN", q:"Was ist die <b>Trikotnummer</b> von Joshua Kimmich bei der WM 2026?", a:"Die 6", sub:"Klassische Kapitäns- und Sechser-Nummer. Im Verein trägt er die 8.", goto:6 },
+
+  // REKORDE 🏆 (+10)
+  { cat:"🏆", catName:"REKORDE", q:"Wer ist der <b>WM-Torrekordhalter</b> aller Zeiten?", a:"Miroslav Klose", sub:"16 WM-Tore in 4 Turnieren mit Deutschland (2002, 2006, 2010, 2014). Schlug 2014 Ronaldos Rekord." },
+  { cat:"🏆", catName:"REKORDE", q:"Wer schoss das <b>schnellste WM-Tor</b> aller Zeiten?", a:"Hakan Şükür (Türkei)", sub:"11 Sekunden nach Anpfiff gegen Südkorea 2002. Spiel um Platz 3." },
+  { cat:"🏆", catName:"REKORDE", q:"Welche Nation hat die <b>meisten WM-Teilnahmen</b>?", a:"Brasilien", sub:"Bislang bei ALLEN 22 Weltmeisterschaften dabei – als einziges Land." },
+  { cat:"🏆", catName:"REKORDE", q:"Wie viele <b>Sterne</b> hat Deutschland aktuell auf dem Trikot?", a:"4 Sterne", sub:"1954 Bern · 1974 München · 1990 Rom · 2014 Maracanã. Wenn 2026 kommt: 5 Sterne." },
+  { cat:"🏆", catName:"REKORDE", q:"Welches Land schied <b>2022 in Katar</b> überraschend in der Vorrunde aus?", a:"Deutschland", sub:"Schon zum zweiten Mal in Folge. 1:2 gegen Japan, 1:1 gegen Spanien, 4:2 gegen Costa Rica reichten nicht." },
+  { cat:"🏆", catName:"REKORDE", q:"Wer war <b>jüngster WM-Torschütze</b> aller Zeiten?", a:"Pelé", sub:"Mit 17 Jahren beim Halbfinale 1958. Im Finale machte er nochmal 2 Tore – Brasilien wurde Weltmeister." },
+  { cat:"🏆", catName:"REKORDE", q:"Welcher Spieler hat die <b>meisten WM-Spiele</b> bestritten?", a:"Lionel Messi", sub:"26 WM-Spiele in 5 Turnieren (2006–2022). Krönung: Titel mit Argentinien in Katar." },
+  { cat:"🏆", catName:"REKORDE", q:"Wer ist der <b>älteste WM-Torschütze</b> aller Zeiten?", a:"Roger Milla (42)", sub:"Kamerun 1994 gegen Russland. 42 Jahre, 39 Tage alt – tanzt nach Tor wie 25." },
+  { cat:"🏆", catName:"REKORDE", q:"Was bedeutet „<b>Wunder von Bern</b>\"?", a:"DFB wird 1954 Weltmeister", sub:"3:2 gegen Topfavorit Ungarn nach 0:2 Rückstand. Erster DFB-Titel überhaupt, im Wankdorfstadion." },
+  { cat:"🏆", catName:"REKORDE", q:"Welches Spiel war das <b>torreichste</b> WM-Match aller Zeiten?", a:"Österreich 7:5 Schweiz", sub:"Im Viertelfinale 1954, in Lausanne. 12 Tore in 90 Min – bis heute unerreicht." },
+
+  // STADIEN & GEOGRAFIE 🏟 (neu, 10)
+  { cat:"🏟", catName:"STADIEN", q:"In welchem Stadion wird das <b>WM-Finale 2026</b> gespielt?", a:"MetLife Stadium", sub:"East Rutherford, New Jersey. 82.500 Plätze. Finale am 19. Juli 2026." },
+  { cat:"🏟", catName:"STADIEN", q:"Wo findet das <b>Eröffnungsspiel</b> der WM 2026 statt?", a:"Estadio Azteca, Mexico City", sub:"11. Juni 2026, Mexiko vs. Südafrika. Das Azteca ist das einzige Stadion, das schon 2× WM-Finals gehostet hat (1970, 1986)." },
+  { cat:"🏟", catName:"STADIEN", q:"Welches WM-Stadion hat die <b>größte Kapazität</b>?", a:"AT&T Stadium, Dallas", sub:"94.000 Plätze. Heimat der NFL-Dallas-Cowboys. „Jerry's World\" wegen Eigentümer Jerry Jones." },
+  { cat:"🏟", catName:"STADIEN", q:"In wie vielen <b>US-Bundesstaaten</b> wird WM gespielt?", a:"11 Bundesstaaten", sub:"Plus 3 Provinzen in Kanada (Ontario, BC) und Mexiko. Insgesamt 16 Stadien." },
+  { cat:"🏟", catName:"STADIEN", q:"Wie viele <b>kanadische Städte</b> sind Gastgeber?", a:"2 Städte", sub:"Toronto (BMO Field) und Vancouver (BC Place). Kanada ist erstmals WM-Co-Gastgeber." },
+  { cat:"🏟", catName:"STADIEN", q:"Wie viele <b>mexikanische Städte</b> sind Gastgeber?", a:"3 Städte", sub:"Mexico City, Guadalajara, Monterrey. Mexiko ist erstes Land mit 3 WM-Gastgeberschaften (1970, 1986, 2026)." },
+  { cat:"🏟", catName:"STADIEN", q:"Wo spielt Deutschland das <b>Auftaktspiel</b> gegen Curaçao?", a:"NRG Stadium, Houston", sub:"Heimstadion der NFL-Houston-Texans. 72.000 Plätze, schließbares Dach gegen die texanische Hitze." },
+  { cat:"🏟", catName:"STADIEN", q:"In welcher Stadt spielt Deutschland gegen die <b>Elfenbeinküste</b>?", a:"Toronto", sub:"BMO Field. 20. Juni, 22:00 dt. Zeit. Einer von zwei Auftritten der DFB-Elf nördlich der US-Grenze." },
+  { cat:"🏟", catName:"STADIEN", q:"In welcher Stadt spielt Deutschland gegen <b>Ecuador</b>?", a:"New York / New Jersey", sub:"MetLife Stadium. Quasi schon Generalprobe fürs Finale, das auch dort steigt." },
+  { cat:"🏟", catName:"STADIEN", q:"Wie viele <b>Zeitzonen</b> umfasst die WM 2026?", a:"4 Zeitzonen", sub:"Von Eastern Time (NY) bis Pacific Time (Vancouver, LA). Schwierig für die Reiseplanung der Teams." },
+
+  // DFB-HISTORIE 📜 (neu, 10)
+  { cat:"📜", catName:"HISTORIE", q:"Wer war Bundestrainer beim <b>WM-Titel 2014</b>?", a:"Joachim Löw", sub:"„Jogi\" Löw. Übernahm 2006 von Jürgen Klinsmann, blieb bis 2021. Sein einziger WM-Titel." },
+  { cat:"📜", catName:"HISTORIE", q:"Wer schoss das <b>Siegtor im WM-Finale 2014</b>?", a:"Mario Götze", sub:"In der 113. Minute mit der Brust und linkem Fuß ins Netz. Vorlage: André Schürrle." },
+  { cat:"📜", catName:"HISTORIE", q:"Welches Halbfinal-Ergebnis machte 2014 Geschichte?", a:"Brasilien 1:7 Deutschland", sub:"Berühmtestes Halbfinale aller Zeiten. Klose stellte mit seinem 16. WM-Tor den Allzeit-Rekord auf." },
+  { cat:"📜", catName:"HISTORIE", q:"Wann wurde Deutschland <b>zum letzten Mal Europameister</b>?", a:"1996 in England", sub:"Unter Berti Vogts. Siegtor: Oliver Bierhoff per Golden Goal gegen Tschechien." },
+  { cat:"📜", catName:"HISTORIE", q:"Wer war <b>WM-Trainer 1974</b> beim deutschen Heim-Titel?", a:"Helmut Schön", sub:"2:1-Finale gegen die Niederlande im Münchner Olympiastadion. Aufstellung mit Beckenbauer, Müller, Maier." },
+  { cat:"📜", catName:"HISTORIE", q:"Welcher Spieler heißt „<b>Bomber der Nation</b>\"?", a:"Gerd Müller", sub:"68 Tore in 62 DFB-Spielen. 1972 EM-Sieg, 1974 WM-Sieg. Schoss das Finaltor 1974." },
+  { cat:"📜", catName:"HISTORIE", q:"Wer war Kapitän beim <b>WM-Titel 1990</b>?", a:"Lothar Matthäus", sub:"Trat den 1:0-Siegelfmeter im Finale gegen Argentinien aber nicht selbst, sondern Andi Brehme. Ballon d'Or im selben Jahr." },
+  { cat:"📜", catName:"HISTORIE", q:"Wer war <b>Torschützenkönig der WM 2014</b> seitens Deutschland?", a:"Thomas Müller (5 Tore)", sub:"Müller gewann 2010 den Goldenen Schuh, war 2014 erneut sehr treffsicher – aber Goldener Schuh ging 2014 an James Rodríguez." },
+  { cat:"📜", catName:"HISTORIE", q:"Welches Trikot trug Deutschland im <b>Finale 2014</b>?", a:"Weiß (Heimtrikot)", sub:"Mit roten und schwarzen Akzenten. Das ikonische Trikot ohne Sponsor-Trikot vorne (nur DFB-Logo + Adidas-Streifen)." },
+  { cat:"📜", catName:"HISTORIE", q:"Welcher Trainer betreut Brasilien aktuell?", a:"Carlo Ancelotti", sub:"Erster ausländischer Brasilien-Trainer überhaupt. Übernahm Mitte 2025 nach seiner Real-Madrid-Zeit." }
 ];
 
 let triviaIdx = 0;
