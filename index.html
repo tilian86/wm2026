@@ -1293,6 +1293,86 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   border-left: 3px solid var(--gold);
 }
 .news-card .summary b { color: var(--gold); }
+
+/* DETAILS / Ausklappbar */
+.news-card details {
+  margin-top: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.news-card details summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  list-style: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.news-card details summary::-webkit-details-marker { display: none; }
+.news-card details summary::before {
+  content: '▸';
+  display: inline-block;
+  transition: transform 0.2s;
+  font-size: 10px;
+}
+.news-card details[open] summary::before {
+  transform: rotate(90deg);
+}
+.news-card details[open] summary {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.news-card .long-day {
+  font-size: 13px; line-height: 1.55;
+}
+.news-card .long-day h5 {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 12px 0 4px;
+}
+.news-card .long-day .match-block {
+  background: var(--card-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.news-card .long-day .match-block .ttl {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.news-card .long-day .match-block .scorers {
+  color: var(--muted); font-size: 11.5px;
+}
+.news-card .long-day .standings-block {
+  background: var(--card-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+}
+.news-card .long-day .standings-block .gname {
+  font-size: 11px; font-weight: 800; color: var(--gold);
+  letter-spacing: 1px;
+}
+.news-card .long-day .standings-block table {
+  width: 100%; font-size: 11.5px; margin-top: 6px;
+}
+.news-card .long-day .standings-block td { padding: 2px 4px; }
+.news-card .long-day .standings-block .pts { text-align: right; color: var(--gold); font-weight: 700; }
+.news-card .long-day .standings-block .deu td { background: rgba(255,206,0,0.08); }
+
+.data-source {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 8px;
+}
+.data-source a { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -2504,13 +2584,24 @@ function renderNews() {
   const autoNews = generateAutoNews();
   const all = [...autoNews, ...NEWS];
   document.getElementById('newsList').innerHTML = all.map((n) => {
-    const textBlock = n.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    // Vorlese-Text: details-Inhalte rausnehmen (kommen eh extra)
+    const short = n.body.replace(/<details[\s\S]*?<\/details>/g, '');
+    const textBlock = short.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    // Optional: separater Speak-Button in den Details für den langen Bericht
+    let bodyWithDetailSpeak = n.body;
+    const longTextMatch = n.body.match(/<details>[\s\S]*?<div class="long-day">([\s\S]*?)<\/div>[\s\S]*?<\/details>/);
+    if (longTextMatch) {
+      const longText = longTextMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const speakLong = `<div style="margin-top:10px;">${speakBtn('Detailbericht: ' + longText, 'Detailbericht vorlesen')}</div>`;
+      // Vor </details> einfügen
+      bodyWithDetailSpeak = n.body.replace('</details>', speakLong + '</details>');
+    }
     return `
     <div class="news-card">
       <span class="badge ${n.type}">${n.badge}</span>
       <h3>${n.title}</h3>
       <div class="date">${n.date}</div>
-      ${n.body}
+      ${bodyWithDetailSpeak}
       <div class="news-actions">${speakBtn(`${n.title}. ${textBlock}`, 'Vorlesen')}</div>
     </div>
   `}).join('');
@@ -2578,6 +2669,12 @@ function generateAutoNews() {
     // Tagessummary mit Kontext zur ganzen WM
     const summary = generateDailySummary(yesterdayMatches);
     if (summary) body += `<div class="summary"><b>📝 Tageszusammenfassung:</b><br>${summary}</div>`;
+    // Ausführliche Variante zum Ausklappen
+    const longSummary = generateLongDailySummary(yesterdayMatches);
+    if (longSummary) {
+      body += `<details><summary>📖 Mehr Details (Torschützen, Gruppenstand)</summary><div class="long-day">${longSummary}</div></details>`;
+    }
+    body += `<div class="data-source">📡 Daten: <a href="https://github.com/openfootball/worldcup.json" target="_blank" rel="noopener">openfootball</a> · aktualisiert sich täglich automatisch</div>`;
     out.push({ type: 'post', badge: 'GESTERN', title: '🔁 Was gestern passiert ist', date: yStr, body });
   }
 
@@ -3117,6 +3214,73 @@ function generateDailySummary(matches) {
     if (leaders.length) s += `Tabellenführer nach den gestrigen Spielen: ${leaders.join(' · ')}.`;
   }
   return s;
+}
+
+// Lange Tageszusammenfassung mit allen Details
+function generateLongDailySummary(matches) {
+  if (!matches.length) return '';
+  let html = '';
+
+  // Pro Spiel: Block mit Endstand + Torschützen
+  html += `<h5>⚽ Alle Spiele im Detail</h5>`;
+  matches.forEach(m => {
+    const [g1, g2] = m.score.ft;
+    const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
+    const winner = g1 > g2 ? m.team1 : g1 < g2 ? m.team2 : null;
+    let result = winner ? `Sieg für ${germanTeam(winner)}` : 'Unentschieden';
+    // Überraschung erkennen (Tordifferenz >= 3 oder kleines Land schlägt großes)
+    const surpriseTeams = ['Curacao','Curaçao','Cape Verde','New Zealand','Jordan','Haiti','Uzbekistan'];
+    let surprise = '';
+    if (Math.abs(g1 - g2) >= 4) surprise = ' 💥 (Kantersieg!)';
+    if (winner && surpriseTeams.includes(winner)) surprise = ' 🤯 (Überraschung!)';
+    html += `<div class="match-block">
+      <div class="ttl">${flagFor(m.team1)} ${germanTeam(m.team1)} <b style="color:var(--gold);">${g1}:${g2}</b> ${germanTeam(m.team2)} ${flagFor(m.team2)}${isDFB ? ' ⭐' : ''}</div>
+      <div class="scorers">${result}${surprise}${m.group ? ' · ' + m.group.replace('Group','Gr.') : ''}${m.ground ? ' · ' + m.ground : ''}</div>`;
+    const goals = [
+      ...(m.goals1 || []).map(g => ({ ...g, team: m.team1 })),
+      ...(m.goals2 || []).map(g => ({ ...g, team: m.team2 })),
+    ].sort((a, b) => parseInt(a.minute) - parseInt(b.minute));
+    if (goals.length) {
+      html += `<div class="scorers" style="margin-top:6px;">⚽ ${goals.map(g => `${g.minute}' ${g.name} (${flagFor(g.team)})`).join(' · ')}</div>`;
+    }
+    html += `</div>`;
+  });
+
+  // Pro betroffener Gruppe: aktueller Tabellenstand
+  const groupsTouched = [...new Set(matches.map(m => m.group).filter(Boolean))];
+  if (groupsTouched.length && wmData) {
+    html += `<h5>📊 Tabellen nach den gestrigen Spielen</h5>`;
+    groupsTouched.sort().forEach(g => {
+      const allInGroup = wmData.matches.filter(x => x.group === g);
+      const standings = computeStandings(allInGroup);
+      if (!standings.length || standings[0].pl === 0) return;
+      html += `<div class="standings-block">
+        <div class="gname">${g}</div>
+        <table>
+          ${standings.map((t, i) => `
+            <tr class="${t.name === 'Germany' ? 'deu' : ''}">
+              <td style="width:18px;color:var(--muted);">${i + 1}.</td>
+              <td>${flagFor(t.name)} ${germanTeam(t.name)}${t.name === 'Germany' ? ' 🇩🇪' : ''}</td>
+              <td style="width:50px;text-align:center;color:var(--muted);">${t.gf}:${t.ga}</td>
+              <td class="pts" style="width:36px;">${t.pts} P.</td>
+            </tr>
+          `).join('')}
+        </table>
+      </div>`;
+    });
+  }
+
+  // Generelle WM-Einordnung (nur bei wichtigen Phasen)
+  const totalFinished = wmData ? wmData.matches.filter(m => matchStatus(m) === 'finished').length : 0;
+  const totalGroupGames = wmData ? wmData.matches.filter(m => m.group).length : 72;
+  const pct = Math.round(totalFinished / totalGroupGames * 100);
+  if (totalFinished > 0 && totalFinished < totalGroupGames) {
+    html += `<h5>🌍 Stand der gesamten WM</h5><div class="match-block"><div class="scorers">${totalFinished} von ${totalGroupGames} Gruppenspielen abgeschlossen (${pct} %). Die Vorrunde läuft noch bis zum 26. Juni. Die K.o.-Phase startet am 27. Juni mit dem Achtzehntelfinale (Runde der 32).</div></div>`;
+  } else if (totalFinished >= totalGroupGames) {
+    html += `<h5>🌍 Stand der gesamten WM</h5><div class="match-block"><div class="scorers">Vorrunde komplett – K.o.-Phase läuft. Schau in den Tab <b>🥅 Turnierbaum</b> wer noch dabei ist.</div></div>`;
+  }
+
+  return html;
 }
 
 // ============================================================
