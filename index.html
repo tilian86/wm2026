@@ -972,7 +972,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   font-size: 13px; font-weight: 800; margin-top: 8px;
   display: none;
 }
-.duel-option.right .answer, .duel-option.wrong .answer { display: block; }
+.duel-option.revealed .answer { display: block; color: var(--muted); }
 .duel-option.right .answer { color: var(--green); }
 .duel-option.wrong .answer { color: var(--red); }
 .duel-vs {
@@ -2563,6 +2563,7 @@ function duelPick(picked, correct, optEl) {
   duelLocked = true;
   const allOpts = document.querySelectorAll('.duel-option');
   allOpts.forEach(o => {
+    o.classList.add('revealed');
     const nr = parseInt(o.dataset.nr);
     if (nr === correct) o.classList.add('right');
     else if (nr === picked) o.classList.add('wrong');
