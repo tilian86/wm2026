@@ -12,8 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DFB WM 2026">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
-<script src="https://unpkg.com/globe.gl@2.31.1/dist/globe.gl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.31.1/dist/globe.gl.min.js"></script>
 <style>
 :root {
   --bg: #0a0a0a;
@@ -3708,14 +3707,29 @@ let globeFilter = 'upcoming';
 
 async function renderGlobe() {
   if (!wmData) { await loadWMData(false); }
-  if (!globeInstance && typeof Globe !== 'undefined') {
+  // Globe.gl muss geladen sein, sonst kurz warten
+  if (typeof Globe === 'undefined') {
+    document.getElementById('globeEl').innerHTML = '<div class="wm-loading">Lade 3D-Globus … (Internet-Verbindung nötig)</div>';
+    await new Promise(r => setTimeout(r, 800));
+    if (typeof Globe === 'undefined') {
+      document.getElementById('globeEl').innerHTML = '<div class="wm-loading">Globus konnte nicht geladen werden. Seite neu laden hilft meistens.</div>';
+      return;
+    }
+  }
+  if (!globeInstance) {
     const el = document.getElementById('globeEl');
+    // Warten bis Layout sitzt - sonst clientWidth = 0 und Globe rendert leer
+    await new Promise(r => setTimeout(r, 100));
+    const w = Math.max(el.clientWidth, 320);
+    const h = Math.max(el.clientHeight, 360);
+    el.innerHTML = '';
     globeInstance = Globe()
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-night.jpg')
+      .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
       .atmosphereColor('#FFCE00')
-      .atmosphereAltitude(0.15)
+      .atmosphereAltitude(0.18)
+      .showAtmosphere(true)
       .pointAltitude(d => d.altitude || 0.02)
       .pointRadius(d => d.radius || 0.5)
       .pointColor(d => d.color || '#fff')
@@ -3725,22 +3739,29 @@ async function renderGlobe() {
         focusOnPin(d);
         renderGlobeList(d.city);
       })
-      .width(el.clientWidth)
-      .height(el.clientHeight)
+      .width(w)
+      .height(h)
       (el);
-    // Auto-Rotation und Controls
-    const controls = globeInstance.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.4;
-    controls.enableZoom = true;
-    controls.minDistance = 200;
-    controls.maxDistance = 600;
-    // Standard-Position über Nordamerika
-    globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 0);
-    // Beim Resize
+    // Auto-Rotation + Controls erst nach Init verfügbar
+    setTimeout(() => {
+      const controls = globeInstance.controls();
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.4;
+      controls.enableZoom = true;
+      controls.minDistance = 200;
+      controls.maxDistance = 600;
+      globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 0);
+    }, 100);
+    // Bei Resize Größe anpassen
     new ResizeObserver(() => {
-      globeInstance.width(el.clientWidth).height(el.clientHeight);
+      const newW = Math.max(el.clientWidth, 320);
+      const newH = Math.max(el.clientHeight, 360);
+      globeInstance.width(newW).height(newH);
     }).observe(el);
+  } else {
+    // Beim erneuten Öffnen prüfen ob Größe noch passt
+    const el = document.getElementById('globeEl');
+    globeInstance.width(Math.max(el.clientWidth, 320)).height(Math.max(el.clientHeight, 360));
   }
   updateGlobePoints();
   renderGlobeList();
