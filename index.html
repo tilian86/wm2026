@@ -3704,6 +3704,8 @@ const STADIUMS = {
 };
 let globeInstance = null;
 let globeFilter = 'upcoming';
+let selectedCity = null;
+let selectedMatchIdx = null;
 
 async function renderGlobe() {
   if (!wmData) { await loadWMData(false); }
@@ -3736,9 +3738,18 @@ async function renderGlobe() {
       .pointResolution(8)
       .pointLabel(d => `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:8px;border:1px solid #FFCE00;color:white;font-family:-apple-system,sans-serif;"><b style="color:#FFCE00;">${d.flag || ''} ${d.city}</b><br><span style="font-size:11px;">${d.matchCount} Spiel${d.matchCount > 1 ? 'e' : ''}</span></div>`)
       .onPointClick(d => {
+        selectedCity = d.city;
+        selectedMatchIdx = null;
         focusOnPin(d);
+        updateGlobePoints();
+        updateSelectedRing();
         renderGlobeList(d.city);
       })
+      .ringColor(d => d.color || '#DD0000')
+      .ringAltitude(0.008)
+      .ringMaxRadius(6)
+      .ringPropagationSpeed(3)
+      .ringRepeatPeriod(700)
       .width(w)
       .height(h)
       (el);
@@ -3748,8 +3759,8 @@ async function renderGlobe() {
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.4;
       controls.enableZoom = true;
-      controls.minDistance = 200;
-      controls.maxDistance = 600;
+      controls.minDistance = 120;  // stärkerer Zoom rein
+      controls.maxDistance = 700;
       globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 0);
     }, 100);
     // Bei Resize Größe anpassen
@@ -3790,36 +3801,58 @@ function updateGlobePoints() {
     else if (globeFilter === 'live') matches = matches.filter(m => matchStatus(m) === 'live');
     else if (globeFilter === 'done') matches = matches.filter(m => matchStatus(m) === 'finished');
     else if (globeFilter === 'dfb') matches = matches.filter(m => m.team1 === 'Germany' || m.team2 === 'Germany');
-    if (!matches.length) return null;
+    // Selected city soll IMMER sichtbar bleiben, auch wenn Filter ihn ausschließt
+    const isSelected = city === selectedCity;
+    if (!matches.length && !isSelected) return null;
     const hasDeu = matches.some(m => m.team1 === 'Germany' || m.team2 === 'Germany');
     const hasLive = matches.some(m => matchStatus(m) === 'live');
-    const allDone = matches.every(m => matchStatus(m) === 'finished');
+    const allDone = matches.length > 0 && matches.every(m => matchStatus(m) === 'finished');
     let color = '#fff';
-    if (hasDeu) color = '#FFCE00';
+    if (isSelected) color = '#FF1744';  // Knall-Rot für ausgewählt
+    else if (hasDeu) color = '#FFCE00';
     else if (hasLive) color = '#DD0000';
     else if (allDone) color = '#4caf50';
     return {
       lat: info.lat, lng: info.lng,
       city, flag: info.country,
       color,
-      radius: Math.min(1.5, 0.4 + matches.length * 0.15),
-      altitude: hasDeu ? 0.06 : (hasLive ? 0.04 : 0.02),
-      matchCount: matches.length,
+      radius: isSelected ? 2.0 : Math.min(1.5, 0.4 + matches.length * 0.15),
+      altitude: isSelected ? 0.12 : (hasDeu ? 0.06 : (hasLive ? 0.04 : 0.02)),
+      matchCount: matches.length || allCityMatches.length,
     };
   }).filter(Boolean);
   globeInstance.pointsData(points);
 }
 
+function updateSelectedRing() {
+  if (!globeInstance) return;
+  if (selectedCity && STADIUMS[selectedCity]) {
+    const info = STADIUMS[selectedCity];
+    globeInstance.ringsData([{
+      lat: info.lat, lng: info.lng, color: '#FF1744'
+    }]);
+  } else {
+    globeInstance.ringsData([]);
+  }
+}
+
 function focusOnPin(point) {
   if (!globeInstance) return;
   globeInstance.controls().autoRotate = false;
-  globeInstance.pointOfView({ lat: point.lat, lng: point.lng, altitude: 0.8 }, 1500);
+  // näherer Zoom als vorher
+  globeInstance.pointOfView({ lat: point.lat, lng: point.lng, altitude: 0.4 }, 1400);
 }
 
 function resetGlobeView() {
   if (!globeInstance) return;
+  selectedCity = null;
+  selectedMatchIdx = null;
+  updateGlobePoints();
+  updateSelectedRing();
   globeInstance.controls().autoRotate = true;
   globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 1500);
+  // Match-Liste zurück auf normalen Filter
+  renderGlobeList();
 }
 window.resetGlobeView = resetGlobeView;
 
@@ -3828,7 +3861,16 @@ function zoomToMatch(matchIdx) {
   if (!m || !m.ground) return;
   const info = STADIUMS[m.ground];
   if (!info) return;
+  selectedCity = m.ground;
+  selectedMatchIdx = matchIdx;
+  // Auf Handy: Globus nach oben scrollen, damit man die Rotation auch sieht
+  const globeBox = document.getElementById('globeMap');
+  if (globeBox) {
+    globeBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
   focusOnPin({ lat: info.lat, lng: info.lng });
+  updateGlobePoints();
+  updateSelectedRing();
 }
 window.zoomToMatch = zoomToMatch;
 
