@@ -2436,7 +2436,62 @@ function renderNews() {
 function generateAutoNews() {
   if (!wmData || !wmData.matches) return [];
   const out = [];
-  // DFB-Spiele rückwärts (neuestes zuerst)
+
+  // 1. Tages-Übersicht: Heute spielt + Gestern Ergebnisse
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startTomorrow = startToday + 24 * 60 * 60 * 1000;
+  const startYesterday = startToday - 24 * 60 * 60 * 1000;
+
+  const todayMatches = wmData.matches.filter(m => {
+    const t = parseMatchTime(m);
+    return t && t >= startToday && t < startTomorrow;
+  }).sort((a, b) => (parseMatchTime(a) || 0) - (parseMatchTime(b) || 0));
+
+  const yesterdayMatches = wmData.matches.filter(m => {
+    const t = parseMatchTime(m);
+    return t && t >= startYesterday && t < startToday && matchStatus(m) === 'finished';
+  }).sort((a, b) => (parseMatchTime(a) || 0) - (parseMatchTime(b) || 0));
+
+  if (todayMatches.length) {
+    const todayStr = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+    let body = `<p>Heute (${todayStr}) stehen <b>${todayMatches.length} Spiele</b> an:</p><ul>`;
+    todayMatches.forEach(m => {
+      const t = parseMatchTime(m);
+      const time = new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      const status = matchStatus(m);
+      const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
+      let line = `${time} Uhr — ${flagFor(m.team1)} ${germanTeam(m.team1)} vs. ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
+      if (status === 'finished') {
+        line += ` <b>(${m.score.ft[0]}:${m.score.ft[1]})</b>`;
+      } else if (status === 'live') {
+        const ht = m.score?.ht;
+        line += ht ? ` 🔴 LIVE (${ht[0]}:${ht[1]} HZ)` : ' 🔴 LIVE';
+      }
+      if (m.group) line += ` <span style="color:var(--muted);">· ${m.group.replace('Group','Gr.')}</span>`;
+      if (isDFB) line = `<b style="color:var(--gold);">⭐ ${line}</b>`;
+      body += `<li>${line}</li>`;
+    });
+    body += `</ul>`;
+    out.push({ type: 'pre', badge: 'HEUTE', title: '📅 Wer spielt heute?', date: todayStr, body });
+  }
+
+  if (yesterdayMatches.length) {
+    const yDate = new Date(startYesterday);
+    const yStr = yDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+    let body = `<p>Die <b>${yesterdayMatches.length} Ergebnisse</b> von gestern:</p><ul>`;
+    yesterdayMatches.forEach(m => {
+      const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
+      let line = `${flagFor(m.team1)} ${germanTeam(m.team1)} <b>${m.score.ft[0]}:${m.score.ft[1]}</b> ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
+      if (m.group) line += ` <span style="color:var(--muted);">· ${m.group.replace('Group','Gr.')}</span>`;
+      if (isDFB) line = `<b style="color:var(--gold);">⭐ ${line}</b>`;
+      body += `<li>${line}</li>`;
+    });
+    body += `</ul>`;
+    out.push({ type: 'post', badge: 'GESTERN', title: '🔁 Was gestern passiert ist', date: yStr, body });
+  }
+
+  // 2. DFB-Spiele rückwärts (neuestes zuerst)
   const dfbMatches = wmData.matches.filter(m =>
     m.team1 === 'Germany' || m.team2 === 'Germany'
   ).sort((a, b) => (parseMatchTime(b) || 0) - (parseMatchTime(a) || 0));
