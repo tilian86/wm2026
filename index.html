@@ -1273,6 +1273,101 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   text-align: center;
 }
 
+/* PYRAMID BRACKET */
+.bracket-pyramid {
+  background: linear-gradient(180deg, rgba(255,206,0,0.06) 0%, transparent 50%, rgba(221,0,0,0.03) 100%);
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 14px 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.pyr-row { display: flex; gap: 6px; margin-bottom: 18px; align-items: stretch; min-width: max-content; flex-direction: column; align-items: center; }
+.pyr-row-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; background: rgba(0,0,0,0.6); padding: 3px 12px; border-radius: 999px; }
+.pyr-row-inner { display: flex; gap: 6px; min-width: max-content; }
+.pyr-row.qf .pyr-row-inner, .pyr-row.sf .pyr-row-inner { gap: 14px; }
+.pyr-row.finale .pyr-row-inner { gap: 24px; }
+.pyr-card {
+  flex: 0 0 auto; background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 8px; cursor: pointer; font-size: 11px;
+  min-width: 110px; max-width: 140px; transition: transform 0.15s;
+}
+.pyr-card:active { transform: scale(0.96); }
+.pyr-card:hover { border-color: var(--gold); }
+.pyr-card.deu { border-color: var(--gold); background: rgba(255,206,0,0.08); }
+.pyr-card.live { border-color: var(--red); }
+.pyr-card .pt { display: flex; align-items: center; gap: 4px; padding: 2px 0; font-size: 11px; }
+.pyr-card .pt .fl { font-size: 12px; flex-shrink: 0; }
+.pyr-card .pt .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.pyr-card .pt .sc { font-weight: 900; color: var(--gold); font-size: 13px; }
+.pyr-card .pt.loser .nm { color: var(--muted); opacity: 0.6; }
+.pyr-card .pt.winner .nm { color: var(--gold); }
+.pyr-card .pt.tbd .nm { color: var(--muted); font-style: italic; font-size: 10px; }
+.pyr-card.final-card {
+  min-width: 200px; max-width: 220px; border: 2px solid var(--gold);
+  background: linear-gradient(135deg, rgba(255,206,0,0.2), rgba(255,206,0,0.05));
+  padding: 10px 12px; font-size: 13px;
+}
+.pyr-card.final-card .pt { padding: 4px 0; font-size: 13px; }
+.pyr-card.final-card .pt .sc { font-size: 18px; }
+.pyr-groups { display: grid; grid-template-columns: repeat(12, 70px); gap: 4px; }
+.pyr-group {
+  background: var(--card-2); border-radius: 6px; padding: 6px 4px;
+  text-align: center; font-size: 10px;
+}
+.pyr-group .gname { font-weight: 800; color: var(--gold); font-size: 11px; }
+.pyramid-hint { text-align: center; color: var(--muted); font-size: 11px; margin-top: 10px; }
+
+/* GLOBE TAB - Match-Globus */
+.globe-filter {
+  display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; margin-bottom: 10px;
+}
+.globe-filter::-webkit-scrollbar { display: none; }
+.globe-filter button {
+  flex-shrink: 0; background: var(--card); border: 1px solid var(--border); color: var(--muted);
+  padding: 7px 13px; border-radius: 999px; font-size: 12px;
+  font-family: inherit; cursor: pointer; font-weight: 600; white-space: nowrap;
+}
+.globe-filter button.active { background: var(--gold); color: #000; border-color: var(--gold); }
+.match-globe-list { display: grid; gap: 8px; margin-top: 14px; }
+.match-row {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 12px;
+  display: grid; grid-template-columns: 56px 1fr auto; gap: 10px;
+  align-items: center; cursor: pointer; transition: transform 0.15s;
+}
+.match-row:active { transform: scale(0.98); }
+.match-row.deu { border-color: var(--gold); background: rgba(255,206,0,0.05); }
+.match-row.live { border-color: var(--red); }
+.match-row .when { background: var(--card-2); border-radius: 8px; text-align: center; padding: 6px; }
+.match-row .when .dy { font-size: 14px; font-weight: 900; color: var(--gold); line-height: 1; }
+.match-row .when .mo { font-size: 8px; color: var(--muted); text-transform: uppercase; }
+.match-row .when .tm { font-size: 11px; color: var(--txt); margin-top: 2px; font-weight: 700; }
+.match-row .info .teams { font-size: 13px; font-weight: 700; }
+.match-row .info .loc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.match-row .badge-mini { font-size: 9px; padding: 3px 6px; border-radius: 4px; font-weight: 800; letter-spacing: 1px; background: var(--card-2); color: var(--muted); }
+.match-row .badge-mini.live { background: var(--red); color: white; animation: blinkBg 1.5s infinite; }
+.match-row .badge-mini.done { background: var(--green); color: white; }
+.stream-links {
+  margin-top: 12px; padding: 12px 14px; background: var(--card-2);
+  border-radius: 10px; font-size: 12px; line-height: 1.6;
+}
+.stream-links b { color: var(--gold); }
+.stream-links a {
+  display: inline-block; padding: 4px 10px;
+  background: rgba(255,206,0,0.15); border: 1px solid rgba(255,206,0,0.4);
+  border-radius: 6px; color: var(--gold); text-decoration: none;
+  margin: 4px 4px 0 0; font-weight: 600;
+}
+#globeMap .leaflet-popup-content { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 8px 12px; }
+.globe-pin-deu { background: #FFCE00 !important; }
+.globe-pin-live { background: #DD0000 !important; animation: blinkBg 1.5s infinite; }
+.globe-pin-done { background: #4caf50 !important; }
+.globe-pin {
+  background: #fff; border: 2px solid #000; border-radius: 50%;
+  width: 22px !important; height: 22px !important;
+  text-align: center; font-weight: 900; font-size: 10px; line-height: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
 /* Match-Link in News */
 .match-link {
   display: inline-block;
@@ -1386,6 +1481,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <button class="tab active" data-view="news">📰 News</button>
     <button class="tab" data-view="wm">🏆 Tabelle</button>
     <button class="tab" data-view="bracket">🥅 Turnierbaum</button>
+    <button class="tab" data-view="globe">🌍 Globus</button>
     <button class="tab" data-view="live">🔴 Live</button>
     <button class="tab" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
@@ -1443,8 +1539,32 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 <!-- BRACKET VIEW -->
 <div class="view" id="bracket">
   <h2>🥅 Turnierbaum</h2>
-  <p class="lead">Vom Achtzehntelfinale bis zum Finale. Klick auf ein Spiel für Details. Aktualisiert sich live aus den WM-Daten.</p>
+  <p class="lead">Bottom-Up: unten die Gruppen, oben das Finale. Bei mobilen Geräten seitlich scrollen.</p>
   <div id="bracketContent"><div class="wm-loading">Lade Turnierbaum …</div></div>
+</div>
+
+<!-- GLOBE VIEW -->
+<div class="view" id="globe">
+  <h2>🌍 WM-Globus</h2>
+  <p class="lead">Wo wird wann gespielt? Klicke auf einen Pin im Globus oder eine Karte unten für Details + Stream-Links.</p>
+  <div id="globeMap" style="height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--card);"></div>
+  <div class="globe-filter" id="globeFilter" style="margin-top: 14px;">
+    <button class="active" data-fl="upcoming">⏭ Bevorstehende</button>
+    <button data-fl="today">📅 Heute</button>
+    <button data-fl="live">🔴 Live</button>
+    <button data-fl="done">✅ Beendet</button>
+    <button data-fl="dfb">🇩🇪 DFB</button>
+    <button data-fl="all">Alle</button>
+  </div>
+  <div class="match-globe-list" id="globeMatchList"></div>
+  <div class="stream-links">
+    <b>📺 Wo schauen?</b> WM 2026 läuft in Deutschland bei:<br>
+    <a href="https://www.sportschau.de/fussball/fifa-wm-2026/" target="_blank" rel="noopener">Sportschau (ARD)</a>
+    <a href="https://www.zdf.de/sport/fussball/fifa-wm-2026" target="_blank" rel="noopener">ZDF Sport</a>
+    <a href="https://www.magentasport.de/" target="_blank" rel="noopener">MagentaSport</a>
+    <a href="https://www.dazn.com/de-DE/" target="_blank" rel="noopener">DAZN</a>
+    <br><span style="color:var(--muted);font-size:11px;">Die meisten Spiele kostenlos bei ARD/ZDF, einzelne nur bei MagentaTV.</span>
+  </div>
 </div>
 
 <!-- DUEL VIEW -->
@@ -1633,7 +1753,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 
   <div class="info-box" style="margin-top: 24px;">
     <div class="ttl">💡 WM-MODUS 2026</div>
-    <p>Erstmals <b>48 Mannschaften</b> statt 32. In jeder der 12 Gruppen gibt es 4 Teams. Die zwei Besten ziehen direkt ins Achtzehntelfinale ein, plus die 8 besten Dritten. Heißt: selbst mit einem schwachen Start kann Deutschland noch weiter.</p>
+    <p>Erstmals <b>48 Mannschaften</b> statt 32. In jeder der 12 Gruppen gibt es 4 Teams. Die zwei Besten ziehen direkt ins Sechzehntelfinale ein, plus die 8 besten Dritten. Heißt: selbst mit einem schwachen Start kann Deutschland noch weiter.</p>
   </div>
 </div>
 
@@ -1723,7 +1843,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <div class="term"><div class="word">„Box-to-box"</div><div class="desc">Wörtlich: von Strafraum zu Strafraum. Beschreibt einen Spieler, der <b>überall hilft</b> – hinten verteidigt und vorne aufs Tor läuft.</div></div>
     <div class="term"><div class="word">„Pässe zwischen die Linien"</div><div class="desc">Pässe, die <b>durch die Lücken zwischen Abwehr und Mittelfeld</b> des Gegners gespielt werden. Schwer zu spielen, gefährlich wenn's klappt.</div></div>
     <div class="term"><div class="word">4-2-3-1</div><div class="desc">Die <b>Grundordnung</b> der Spieler auf dem Platz. Bedeutet: 4 Verteidiger, 2 defensive Mittelfeldspieler, 3 offensive, 1 Stürmer. So spielt Deutschland meistens.</div></div>
-    <div class="term"><div class="word">Achtzehntelfinale / Runde der 32</div><div class="desc">Erste K.-o.-Runde der WM 2026 (neu wegen 48 Teams). Wer hier verliert, fliegt raus. Heißt: 16 Spiele, 16 Verlierer.</div></div>
+    <div class="term"><div class="word">Sechzehntelfinale / Runde der 32</div><div class="desc">Erste K.-o.-Runde der WM 2026 (neu wegen 48 Teams). Wer hier verliert, fliegt raus. Heißt: 16 Spiele, 16 Verlierer.</div></div>
   </div>
 </div>
 
@@ -1948,6 +2068,9 @@ document.querySelectorAll('.tab').forEach(btn => {
     if (btn.dataset.view === 'bracket' && typeof renderBracket === 'function') {
       if (typeof loadWMData === 'function') loadWMData(false).then(() => renderBracket());
       else renderBracket();
+    }
+    if (btn.dataset.view === 'globe' && typeof renderGlobe === 'function') {
+      renderGlobe();
     }
     if (btn.dataset.view === 'guess' && typeof startGuessSetup === 'function' && !document.getElementById('guessShell').innerHTML.trim()) {
       startGuessSetup();
@@ -2522,7 +2645,7 @@ const NEWS = [
     <p>Neue Regeln, die du kennen solltest:</p>
     <ul>
       <li><b>12 Gruppen mit je 4 Teams</b> – die 2 Besten + die 8 besten Drittplatzierten kommen weiter</li>
-      <li>K.o.-Runde startet mit der Runde der 32 (heißt offiziell „Achtzehntelfinale\")</li>
+      <li>K.o.-Runde startet mit der Runde der 32 (heißt offiziell „Sechzehntelfinale\")</li>
       <li>Bedeutet: <b>Selbst mit nur 3 Punkten</b> kann ein Team noch ins Achtelfinale</li>
     </ul>`,
   },
@@ -3275,7 +3398,7 @@ function generateLongDailySummary(matches) {
   const totalGroupGames = wmData ? wmData.matches.filter(m => m.group).length : 72;
   const pct = Math.round(totalFinished / totalGroupGames * 100);
   if (totalFinished > 0 && totalFinished < totalGroupGames) {
-    html += `<h5>🌍 Stand der gesamten WM</h5><div class="match-block"><div class="scorers">${totalFinished} von ${totalGroupGames} Gruppenspielen abgeschlossen (${pct} %). Die Vorrunde läuft noch bis zum 26. Juni. Die K.o.-Phase startet am 27. Juni mit dem Achtzehntelfinale (Runde der 32).</div></div>`;
+    html += `<h5>🌍 Stand der gesamten WM</h5><div class="match-block"><div class="scorers">${totalFinished} von ${totalGroupGames} Gruppenspielen abgeschlossen (${pct} %). Die Vorrunde läuft noch bis zum 26. Juni. Die K.o.-Phase startet am 27. Juni mit dem Sechzehntelfinale (Runde der 32).</div></div>`;
   } else if (totalFinished >= totalGroupGames) {
     html += `<h5>🌍 Stand der gesamten WM</h5><div class="match-block"><div class="scorers">Vorrunde komplett – K.o.-Phase läuft. Schau in den Tab <b>🥅 Turnierbaum</b> wer noch dabei ist.</div></div>`;
   }
@@ -3287,9 +3410,9 @@ function generateLongDailySummary(matches) {
 // TURNIERBAUM
 // ============================================================
 const ROUND_LABEL = {
-  'Round of 32': '🥅 Achtzehntelfinale',
-  'Round of 16': '🥈 Achtelfinale',
-  'Quarter-finals': '🥉 Viertelfinale',
+  'Round of 32': '⚔️ Sechzehntelfinale',
+  'Round of 16': '⚔️ Achtelfinale',
+  'Quarter-finals': '⚔️ Viertelfinale',
   'Semi-finals': '🏅 Halbfinale',
   'Final': '🏆 Finale',
   'Match for third place': '🥉 Spiel um Platz 3',
@@ -3310,45 +3433,117 @@ function renderBracket() {
     el.innerHTML = '<div class="wm-loading">Daten werden geladen … bitte gleich nochmal antippen.</div>';
     return;
   }
-  const koMatches = wmData.matches.filter(m => isKnockoutRound(m.round));
-  if (!koMatches.length) {
-    el.innerHTML = `<div class="info-box">
-      <div class="ttl">🌱 K.O.-PHASE STARTET AM 27.06.</div>
-      <p>Der Turnierbaum wird gefüllt, sobald die Gruppenphase abgeschlossen ist. Bis dahin schau im Tab <b>🏆 Tabelle</b> wie es in den 12 Gruppen läuft.</p>
-      <p style="margin-top:10px;">Erwarteter Ablauf:</p>
-      <ul style="margin-top:6px;padding-left:18px;">
-        <li><b>27.–30.06.</b> Achtzehntelfinale (R32) – 16 Spiele</li>
-        <li><b>02.–06.07.</b> Achtelfinale (R16) – 8 Spiele</li>
-        <li><b>09.–11.07.</b> Viertelfinale – 4 Spiele</li>
-        <li><b>14.–15.07.</b> Halbfinale – 2 Spiele</li>
-        <li><b>18.07.</b> Spiel um Platz 3</li>
-        <li><b>19.07.</b> Finale in East Rutherford (New York/NJ) 🏆</li>
-      </ul>
-    </div>`;
-    return;
-  }
+  // Gruppen-Phase Daten für Pyramide-Fundament
+  const groups = {};
+  wmData.matches.forEach(m => {
+    if (m.group) {
+      if (!groups[m.group]) groups[m.group] = [];
+      groups[m.group].push(m);
+    }
+  });
+  const groupNames = Object.keys(groups).sort();
+  // KO-Spiele nach Runde gruppiert
   const byRound = {};
-  koMatches.forEach(m => {
+  wmData.matches.filter(m => isKnockoutRound(m.round)).forEach(m => {
     if (!byRound[m.round]) byRound[m.round] = [];
     byRound[m.round].push(m);
   });
-  const order = ['Round of 32','Round of 16','Quarter-finals','Semi-finals','Match for third place','Third-place play-off','Final'];
-  let html = '';
-  order.forEach(round => {
-    if (!byRound[round]) return;
-    const matches = byRound[round].sort((a,b) => (parseMatchTime(a)||0) - (parseMatchTime(b)||0));
-    const expected = ROUND_COUNT[round] || matches.length;
-    html += `<div class="bracket-round">
-      <div class="bracket-round-title">
-        <span>${ROUND_LABEL[round] || round}</span>
-        <span class="ct">${matches.length}/${expected} Spiele</span>
-      </div>
-      <div class="bracket-matches">
-        ${matches.map(m => bracketMatchHtml(m)).join('')}
+  // Pyramid von oben nach unten gerendert
+  let html = '<div class="bracket-pyramid">';
+
+  // FINALE (Top)
+  if (byRound['Final']) {
+    html += `<div class="pyr-row finale">
+      <div class="pyr-row-title">🏆 Finale · 19.07. · MetLife Stadium</div>
+      <div class="pyr-row-inner">${byRound['Final'].map(m => pyrCardHtml(m, true)).join('')}</div>
+    </div>`;
+  } else {
+    html += `<div class="pyr-row finale">
+      <div class="pyr-row-title">🏆 Finale</div>
+      <div class="pyr-row-inner"><div class="pyr-card final-card"><div class="pt tbd"><span class="fl">🏆</span><span class="nm">Sieger Halbfinale 1</span></div><div class="pt tbd"><span class="fl">🏆</span><span class="nm">Sieger Halbfinale 2</span></div></div></div>
+    </div>`;
+  }
+
+  // 3. Platz
+  const third = byRound['Match for third place'] || byRound['Third-place play-off'];
+  if (third) {
+    html += `<div class="pyr-row finale">
+      <div class="pyr-row-title">🥉 Spiel um Platz 3</div>
+      <div class="pyr-row-inner">${third.map(m => pyrCardHtml(m, false)).join('')}</div>
+    </div>`;
+  }
+
+  // HALBFINALE
+  html += pyrRoundHtml('Semi-finals', '🥈 Halbfinale', byRound, 2, 'sf');
+  // VIERTELFINALE
+  html += pyrRoundHtml('Quarter-finals', '🥉 Viertelfinale', byRound, 4, 'qf');
+  // ACHTELFINALE
+  html += pyrRoundHtml('Round of 16', '⚔️ Achtelfinale', byRound, 8, 'r16');
+  // SECHZEHNTELFINALE
+  html += pyrRoundHtml('Round of 32', '⚔️ Sechzehntelfinale', byRound, 16, 'r32');
+  // GRUPPENPHASE - Fundament
+  html += `<div class="pyr-row">
+    <div class="pyr-row-title">🏟 Gruppenphase · 12 Gruppen × 4 Teams</div>
+    <div class="pyr-groups">
+      ${groupNames.map(g => {
+        const standings = computeStandings(groups[g]);
+        const hasDeu = standings.some(t => t.name === 'Germany');
+        return `<div class="pyr-group" style="${hasDeu ? 'border:1px solid var(--gold);' : ''}">
+          <div class="gname">${g.replace('Group ','')}</div>
+          ${standings.slice(0, 4).map((t,i) => `
+            <div style="font-size:9px; color:${i<2?'var(--green)':'var(--muted)'};margin-top:2px;">
+              ${flagFor(t.name)} ${i+1}
+            </div>
+          `).join('')}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  html += '</div>';
+  html += '<div class="pyramid-hint">📱 Auf dem Handy seitlich scrollen für die längeren Runden</div>';
+  el.innerHTML = html;
+}
+
+function pyrRoundHtml(round, label, byRound, expected, cssClass) {
+  const matches = byRound[round] || [];
+  if (matches.length === 0) {
+    // Placeholder mit erwarteter Anzahl
+    return `<div class="pyr-row ${cssClass}">
+      <div class="pyr-row-title">${label} <span style="color:var(--muted);font-weight:500;">(noch nicht ausgelost)</span></div>
+      <div class="pyr-row-inner">
+        ${Array.from({length: expected}, () => '<div class="pyr-card"><div class="pt tbd"><span class="fl">⚽</span><span class="nm">TBD</span></div><div class="pt tbd"><span class="fl">⚽</span><span class="nm">TBD</span></div></div>').join('')}
       </div>
     </div>`;
-  });
-  el.innerHTML = html;
+  }
+  const sorted = matches.sort((a,b) => (parseMatchTime(a)||0) - (parseMatchTime(b)||0));
+  return `<div class="pyr-row ${cssClass}">
+    <div class="pyr-row-title">${label} · ${matches.length}/${expected} Spiele</div>
+    <div class="pyr-row-inner">${sorted.map(m => pyrCardHtml(m, false)).join('')}</div>
+  </div>`;
+}
+
+function pyrCardHtml(m, isFinal) {
+  const idx = wmData.matches.indexOf(m);
+  const status = matchStatus(m);
+  const isDeu = m.team1 === 'Germany' || m.team2 === 'Germany';
+  const isTBD = (t) => !t || /winner|loser|tbd|runner|^\d[A-Z]?$|placement/i.test(t);
+  const tbd1 = isTBD(m.team1), tbd2 = isTBD(m.team2);
+  let c1 = 'pt', c2 = 'pt';
+  if (tbd1) c1 += ' tbd';
+  if (tbd2) c2 += ' tbd';
+  let s1 = '', s2 = '';
+  if (status === 'finished') {
+    s1 = m.score.ft[0]; s2 = m.score.ft[1];
+    if (s1 > s2) { c1 += ' winner'; c2 += ' loser'; }
+    else if (s2 > s1) { c2 += ' winner'; c1 += ' loser'; }
+  } else if (status === 'live' && m.score?.ht) {
+    s1 = m.score.ht[0]; s2 = m.score.ht[1];
+  }
+  return `<div class="pyr-card ${isFinal ? 'final-card' : ''} ${isDeu ? 'deu' : ''} ${status}" onclick="openMatchDetail(${idx})">
+    <div class="${c1}"><span class="fl">${flagFor(m.team1)}</span><span class="nm">${tbd1 ? m.team1 : germanTeam(m.team1)}</span>${s1 !== '' ? `<span class="sc">${s1}</span>` : ''}</div>
+    <div class="${c2}"><span class="fl">${flagFor(m.team2)}</span><span class="nm">${tbd2 ? m.team2 : germanTeam(m.team2)}</span>${s2 !== '' ? `<span class="sc">${s2}</span>` : ''}</div>
+  </div>`;
 }
 
 function bracketMatchHtml(m) {
@@ -3391,6 +3586,124 @@ function bracketMatchHtml(m) {
   </div>`;
 }
 window.renderBracket = renderBracket;
+
+// ============================================================
+// WM-GLOBUS (Match-Karte mit Stream-Links)
+// ============================================================
+const STADIUMS = {
+  "Vancouver": { lat: 49.277, lng: -123.112, country: "🇨🇦" },
+  "Seattle": { lat: 47.595, lng: -122.331, country: "🇺🇸" },
+  "San Francisco Bay Area (Santa Clara)": { lat: 37.403, lng: -121.970, country: "🇺🇸" },
+  "Los Angeles (Inglewood)": { lat: 33.953, lng: -118.339, country: "🇺🇸" },
+  "Guadalajara (Zapopan)": { lat: 20.682, lng: -103.462, country: "🇲🇽" },
+  "Mexico City": { lat: 19.303, lng: -99.150, country: "🇲🇽" },
+  "Monterrey (Guadalupe)": { lat: 25.669, lng: -100.244, country: "🇲🇽" },
+  "Houston": { lat: 29.685, lng: -95.411, country: "🇺🇸" },
+  "Dallas (Arlington)": { lat: 32.747, lng: -97.093, country: "🇺🇸" },
+  "Kansas City": { lat: 39.049, lng: -94.484, country: "🇺🇸" },
+  "Atlanta": { lat: 33.755, lng: -84.400, country: "🇺🇸" },
+  "Miami (Miami Gardens)": { lat: 25.958, lng: -80.239, country: "🇺🇸" },
+  "Toronto": { lat: 43.633, lng: -79.418, country: "🇨🇦" },
+  "Boston (Foxborough)": { lat: 42.091, lng: -71.264, country: "🇺🇸" },
+  "Philadelphia": { lat: 39.901, lng: -75.167, country: "🇺🇸" },
+  "New York/New Jersey (East Rutherford)": { lat: 40.813, lng: -74.074, country: "🇺🇸" },
+};
+let globeMap = null;
+let globeFilter = 'upcoming';
+
+async function renderGlobe() {
+  await loadLeaflet();
+  if (!wmData) { await loadWMData(false); }
+  if (!globeMap) {
+    globeMap = L.map('globeMap', { zoomControl: true }).setView([40, -90], 3);
+    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap, © CARTO', maxZoom: 18,
+    }).addTo(globeMap);
+  } else {
+    globeMap.invalidateSize();
+  }
+  // Marker pro Stadt
+  if (!globeMap._dfbAdded) {
+    Object.entries(STADIUMS).forEach(([city, info]) => {
+      const matches = (wmData?.matches || []).filter(m => m.ground === city);
+      if (!matches.length) return;
+      const hasDeu = matches.some(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+      const allDone = matches.every(m => matchStatus(m) === 'finished');
+      const hasLive = matches.some(m => matchStatus(m) === 'live');
+      let cssClass = 'globe-pin';
+      if (hasDeu) cssClass += ' globe-pin-deu';
+      else if (hasLive) cssClass += ' globe-pin-live';
+      else if (allDone) cssClass += ' globe-pin-done';
+      const icon = L.divIcon({
+        className: cssClass,
+        html: `<span>${matches.length}</span>`,
+        iconSize: [22,22], iconAnchor: [11,11],
+      });
+      L.marker([info.lat, info.lng], { icon })
+        .bindPopup(`<b>${info.country} ${city}</b><br><span style="color:#666;font-size:11px;">${matches.length} Spiel${matches.length>1?'e':''}</span><ul style="margin:6px 0 0;padding-left:18px;font-size:11px;">${matches.slice(0,5).map(m=>`<li>${germanTeam(m.team1)} – ${germanTeam(m.team2)}</li>`).join('')}${matches.length>5?'<li>…</li>':''}</ul>`)
+        .addTo(globeMap);
+    });
+    globeMap._dfbAdded = true;
+  }
+  renderGlobeList();
+  document.querySelectorAll('#globeFilter button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('#globeFilter button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      globeFilter = btn.dataset.fl;
+      renderGlobeList();
+    };
+  });
+}
+
+function renderGlobeList() {
+  if (!wmData || !wmData.matches) return;
+  const now = Date.now();
+  const today0 = new Date(); today0.setHours(0,0,0,0);
+  const tom0 = today0.getTime() + 24*60*60*1000;
+  let list = wmData.matches.filter(m => parseMatchTime(m));
+  if (globeFilter === 'upcoming') list = list.filter(m => (parseMatchTime(m) > now) && matchStatus(m) !== 'finished');
+  else if (globeFilter === 'today') list = list.filter(m => { const t = parseMatchTime(m); return t >= today0.getTime() && t < tom0; });
+  else if (globeFilter === 'live') list = list.filter(m => matchStatus(m) === 'live');
+  else if (globeFilter === 'done') list = list.filter(m => matchStatus(m) === 'finished');
+  else if (globeFilter === 'dfb') list = list.filter(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+  list.sort((a,b) => parseMatchTime(a) - parseMatchTime(b));
+  if (globeFilter === 'done') list.reverse();
+  const showCount = globeFilter === 'all' ? list.length : Math.min(list.length, 30);
+  const slice = list.slice(0, showCount);
+  if (!slice.length) {
+    document.getElementById('globeMatchList').innerHTML = '<div class="wm-loading">Keine Spiele in dieser Kategorie.</div>';
+    return;
+  }
+  document.getElementById('globeMatchList').innerHTML = slice.map(m => {
+    const t = parseMatchTime(m);
+    const d = new Date(t);
+    const day = d.toLocaleDateString('de-DE', { day: '2-digit' });
+    const mo = d.toLocaleDateString('de-DE', { month: 'short' });
+    const tm = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const status = matchStatus(m);
+    const isDeu = m.team1 === 'Germany' || m.team2 === 'Germany';
+    const idx = wmData.matches.indexOf(m);
+    const stadium = STADIUMS[m.ground] ? `${STADIUMS[m.ground].country} ${m.ground}` : (m.ground || '?');
+    let badge = '';
+    if (status === 'finished') badge = `<span class="badge-mini done">${m.score.ft[0]}:${m.score.ft[1]}</span>`;
+    else if (status === 'live') badge = `<span class="badge-mini live">🔴 LIVE</span>`;
+    else badge = `<span class="badge-mini">${m.group ? m.group.replace('Group','Gr.') : (m.round || '')}</span>`;
+    return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="openMatchDetail(${idx})">
+      <div class="when">
+        <div class="dy">${day}</div>
+        <div class="mo">${mo}</div>
+        <div class="tm">${tm}</div>
+      </div>
+      <div class="info">
+        <div class="teams">${flagFor(m.team1)} ${germanTeam(m.team1)} – ${germanTeam(m.team2)} ${flagFor(m.team2)}</div>
+        <div class="loc">📍 ${stadium}</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('') + (list.length > showCount ? `<div class="wm-loading">…und ${list.length - showCount} weitere</div>` : '');
+}
+window.renderGlobe = renderGlobe;
 
 // ============================================================
 // SCHÄTZEN
@@ -3640,14 +3953,37 @@ function fireConfetti() {
 // COUNTDOWN
 // ============================================================
 function startCountdown() {
+  // Statische DFB-Gruppenphase als Fallback. Sobald wmData geladen ist und
+  // DFB ins KO durchkommt, wird das nächste KO-Spiel automatisch gefunden.
   const matches = [
-    { team: "Curaçao", flag: "🇨🇼", iso: "2026-06-14T19:00:00+02:00", date: "14.6. · 19:00 Uhr" },
-    { team: "Elfenbeinküste", flag: "🇨🇮", iso: "2026-06-20T22:00:00+02:00", date: "20.6. · 22:00 Uhr" },
-    { team: "Ecuador", flag: "🇪🇨", iso: "2026-06-25T22:00:00+02:00", date: "25.6. · 22:00 Uhr" }
+    { team: "Curaçao", flag: "🇨🇼", iso: "2026-06-14T19:00:00+02:00", date: "14.6. · 19:00 Uhr", stadium: "NRG Stadium · Houston, USA" },
+    { team: "Elfenbeinküste", flag: "🇨🇮", iso: "2026-06-20T22:00:00+02:00", date: "20.6. · 22:00 Uhr", stadium: "BMO Field · Toronto, Kanada" },
+    { team: "Ecuador", flag: "🇪🇨", iso: "2026-06-25T22:00:00+02:00", date: "25.6. · 22:00 Uhr", stadium: "MetLife Stadium · East Rutherford, NJ" }
   ];
   function tick() {
     const now = new Date();
-    const upcoming = matches.find(m => new Date(m.iso).getTime() + 120*60*1000 > now.getTime());
+    // Falls wmData geladen: schau ob ein DFB-KO-Spiel ansteht (sonst statische Liste)
+    let dynDfb = null;
+    if (wmData && wmData.matches) {
+      const upcomingDfb = wmData.matches.filter(m =>
+        (m.team1 === 'Germany' || m.team2 === 'Germany') &&
+        parseMatchTime(m) && parseMatchTime(m) + 120*60*1000 > now.getTime()
+      ).sort((a,b) => parseMatchTime(a) - parseMatchTime(b));
+      if (upcomingDfb.length) {
+        const m = upcomingDfb[0];
+        const opp = m.team1 === 'Germany' ? m.team2 : m.team1;
+        const t = parseMatchTime(m);
+        const dStr = new Date(t).toLocaleDateString('de-DE', { day: 'numeric', month: 'numeric' });
+        const tStr = new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        dynDfb = {
+          team: germanTeam(opp), flag: flagFor(opp),
+          iso: new Date(t).toISOString(),
+          date: `${dStr} · ${tStr} Uhr`,
+          stadium: m.ground || ''
+        };
+      }
+    }
+    const upcoming = dynDfb || matches.find(m => new Date(m.iso).getTime() + 120*60*1000 > now.getTime());
     const banner = document.getElementById('countdownBanner');
     if (!upcoming) {
       banner.style.display = 'none';
@@ -3656,7 +3992,8 @@ function startCountdown() {
     const kick = new Date(upcoming.iso);
     const ends = new Date(kick.getTime() + 120 * 60 * 1000);
     document.getElementById('cdFlag').textContent = upcoming.flag;
-    document.getElementById('cdMatch').innerHTML = `Deutschland vs. ${upcoming.team} <span>· ${upcoming.date}</span>`;
+    const stadiumLine = upcoming.stadium ? `<br><span style="color:var(--muted);font-size:10px;">📍 ${upcoming.stadium}</span>` : '';
+    document.getElementById('cdMatch').innerHTML = `Deutschland vs. ${upcoming.team} <span>· ${upcoming.date}</span>${stadiumLine}`;
 
     if (now >= kick && now < ends) {
       banner.classList.add('live'); banner.classList.remove('match-day');
