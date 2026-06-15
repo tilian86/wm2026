@@ -1222,6 +1222,77 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   overflow: hidden;
   margin-bottom: 14px;
 }
+
+/* TURNIERBAUM */
+.bracket-round {
+  margin-bottom: 22px;
+}
+.bracket-round-title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; font-weight: 800; letter-spacing: 1px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.bracket-round-title .ct {
+  font-size: 11px; color: var(--muted); letter-spacing: 0;
+  text-transform: none; font-weight: 600;
+}
+.bracket-matches {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.bracket-match {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+  cursor: pointer; transition: transform 0.15s, border-color 0.15s;
+  position: relative;
+}
+.bracket-match:active { transform: scale(0.98); }
+.bracket-match:hover { border-color: var(--gold); }
+.bracket-match.deu { border-color: var(--gold); background: rgba(255,206,0,0.05); }
+.bracket-match.live::before {
+  content: '🔴 LIVE'; position: absolute; top: -8px; right: 10px;
+  background: var(--red); color: white; font-size: 9px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px; letter-spacing: 1px;
+  animation: blinkBg 1s infinite;
+}
+.bracket-team {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; font-size: 14px;
+}
+.bracket-team .team-flag { font-size: 16px; flex-shrink: 0; }
+.bracket-team .team-name { flex: 1; font-weight: 600; }
+.bracket-team .score { font-weight: 900; color: var(--gold); font-size: 18px; min-width: 22px; text-align: right; }
+.bracket-team.loser .team-name { color: var(--muted); opacity: 0.7; }
+.bracket-team.winner .team-name { color: var(--gold); }
+.bracket-team.tbd .team-name { color: var(--muted); font-style: italic; font-size: 13px; }
+.bracket-match-meta {
+  font-size: 10px; color: var(--muted);
+  margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+/* Match-Link in News */
+.match-link {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 6px;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--muted);
+}
+.match-link:hover { color: var(--gold); border-color: var(--gold); }
+.news-card .summary {
+  background: var(--card-2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  border-left: 3px solid var(--gold);
+}
+.news-card .summary b { color: var(--gold); }
 </style>
 </head>
 <body>
@@ -1233,8 +1304,9 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   </div>
   <nav class="tabs">
     <button class="tab active" data-view="news">📰 News</button>
+    <button class="tab" data-view="wm">🏆 Tabelle</button>
+    <button class="tab" data-view="bracket">🥅 Turnierbaum</button>
     <button class="tab" data-view="live">🔴 Live</button>
-    <button class="tab" data-view="wm">🏆 WM-Tabelle</button>
     <button class="tab" data-view="pitch">⚽ Spielfeld</button>
     <button class="tab" data-view="top7">⭐ Top 7</button>
     <button class="tab" data-view="schedule">📅 DFB-Plan</button>
@@ -1286,6 +1358,13 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   <h2>💡 Schätzen in der Gruppe</h2>
   <p class="lead">Pass-the-Phone-Spiel: jeder schätzt eine Zahl, wer am nächsten dran ist gewinnt die Runde. Lerne ganz nebenbei Fakten über den DFB-Kader und die WM.</p>
   <div id="guessShell"></div>
+</div>
+
+<!-- BRACKET VIEW -->
+<div class="view" id="bracket">
+  <h2>🥅 Turnierbaum</h2>
+  <p class="lead">Vom Achtzehntelfinale bis zum Finale. Klick auf ein Spiel für Details. Aktualisiert sich live aus den WM-Daten.</p>
+  <div id="bracketContent"><div class="wm-loading">Lade Turnierbaum …</div></div>
 </div>
 
 <!-- DUEL VIEW -->
@@ -1785,6 +1864,10 @@ document.querySelectorAll('.tab').forEach(btn => {
     }
     if (btn.dataset.view === 'wm' && typeof loadWMData === 'function') {
       loadWMData(false);
+    }
+    if (btn.dataset.view === 'bracket' && typeof renderBracket === 'function') {
+      if (typeof loadWMData === 'function') loadWMData(false).then(() => renderBracket());
+      else renderBracket();
     }
     if (btn.dataset.view === 'guess' && typeof startGuessSetup === 'function' && !document.getElementById('guessShell').innerHTML.trim()) {
       startGuessSetup();
@@ -2461,6 +2544,7 @@ function generateAutoNews() {
       const time = new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
       const status = matchStatus(m);
       const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
+      const reportLink = matchReportLink(m);
       let line = `${time} Uhr — ${flagFor(m.team1)} ${germanTeam(m.team1)} vs. ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
       if (status === 'finished') {
         line += ` <b>(${m.score.ft[0]}:${m.score.ft[1]})</b>`;
@@ -2469,6 +2553,7 @@ function generateAutoNews() {
         line += ht ? ` 🔴 LIVE (${ht[0]}:${ht[1]} HZ)` : ' 🔴 LIVE';
       }
       if (m.group) line += ` <span style="color:var(--muted);">· ${m.group.replace('Group','Gr.')}</span>`;
+      line += ` <a class="match-link" href="${reportLink}" target="_blank" rel="noopener">Bericht ↗</a>`;
       if (isDFB) line = `<b style="color:var(--gold);">⭐ ${line}</b>`;
       body += `<li>${line}</li>`;
     });
@@ -2482,12 +2567,17 @@ function generateAutoNews() {
     let body = `<p>Die <b>${yesterdayMatches.length} Ergebnisse</b> von gestern:</p><ul>`;
     yesterdayMatches.forEach(m => {
       const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
+      const reportLink = matchReportLink(m);
       let line = `${flagFor(m.team1)} ${germanTeam(m.team1)} <b>${m.score.ft[0]}:${m.score.ft[1]}</b> ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
       if (m.group) line += ` <span style="color:var(--muted);">· ${m.group.replace('Group','Gr.')}</span>`;
+      line += ` <a class="match-link" href="${reportLink}" target="_blank" rel="noopener">Bericht ↗</a>`;
       if (isDFB) line = `<b style="color:var(--gold);">⭐ ${line}</b>`;
       body += `<li>${line}</li>`;
     });
     body += `</ul>`;
+    // Tagessummary mit Kontext zur ganzen WM
+    const summary = generateDailySummary(yesterdayMatches);
+    if (summary) body += `<div class="summary"><b>📝 Tageszusammenfassung:</b><br>${summary}</div>`;
     out.push({ type: 'post', badge: 'GESTERN', title: '🔁 Was gestern passiert ist', date: yStr, body });
   }
 
@@ -2770,8 +2860,9 @@ async function loadWMData(forceRefresh = false) {
     const upd = document.getElementById('wmUpdated');
     if (upd) upd.textContent = `Aktualisiert ${lastUpd}`;
     renderWMGroups();
-    // News mit aktuellen Spielständen neu rendern
+    // News + Turnierbaum mit aktuellen Spielständen neu rendern
     if (typeof renderNews === 'function') renderNews();
+    if (typeof renderBracket === 'function' && document.getElementById('bracket').classList.contains('active')) renderBracket();
   } catch (e) {
     if (groupsEl) groupsEl.innerHTML = `<div class="wm-loading">Konnte Daten nicht laden: ${e.message}</div>`;
   }
@@ -2972,6 +3063,170 @@ function openMatchDetail(matchIdx) {
 }
 window.openMatchDetail = openMatchDetail;
 window.loadWMData = loadWMData;
+
+// Externe Berichts-URL (Google-Suche, die meist auf kicker/sportschau/sport1 trifft)
+function matchReportLink(m) {
+  const dateStr = m.date || '';
+  const q = encodeURIComponent(`${germanTeam(m.team1)} ${germanTeam(m.team2)} WM 2026 Spielbericht ${dateStr}`);
+  return `https://www.google.com/search?q=${q}`;
+}
+
+// Generiert eine kurze prosaische Tageszusammenfassung aus den gestrigen Spielen
+function generateDailySummary(matches) {
+  if (!matches.length) return '';
+  let s = '';
+  // Tore gesamt
+  let totalGoals = 0, biggestDiff = 0, biggest = null;
+  matches.forEach(m => {
+    const [g1, g2] = m.score.ft;
+    totalGoals += g1 + g2;
+    if (Math.abs(g1 - g2) > biggestDiff) {
+      biggestDiff = Math.abs(g1 - g2); biggest = m;
+    }
+  });
+  s += `Insgesamt <b>${totalGoals} Tore</b> in ${matches.length} Spielen `;
+  s += `(Schnitt: ${(totalGoals / matches.length).toFixed(1)} pro Spiel). `;
+  if (biggest && biggestDiff >= 2) {
+    const [g1, g2] = biggest.score.ft;
+    const winner = g1 > g2 ? biggest.team1 : biggest.team2;
+    s += `Höchster Sieg: <b>${germanTeam(winner)}</b> mit ${Math.max(g1,g2)}:${Math.min(g1,g2)}. `;
+  }
+  // DFB-Bezug
+  const dfb = matches.find(m => m.team1 === 'Germany' || m.team2 === 'Germany');
+  if (dfb) {
+    const isHome = dfb.team1 === 'Germany';
+    const [g1, g2] = dfb.score.ft;
+    const dfbG = isHome ? g1 : g2, oppG = isHome ? g2 : g1;
+    const opp = germanTeam(isHome ? dfb.team2 : dfb.team1);
+    const verdict = dfbG > oppG ? `hat ${dfbG}:${oppG} gegen ${opp} <b>gewonnen</b>` :
+                    dfbG < oppG ? `hat ${dfbG}:${oppG} gegen ${opp} verloren` :
+                    `hat ${dfbG}:${oppG} gegen ${opp} unentschieden gespielt`;
+    s += `🇩🇪 Deutschland ${verdict}. `;
+  }
+  // Gruppen-Auswirkungen (gestern stattgefundene Gruppen)
+  const groupsTouched = [...new Set(matches.map(m => m.group).filter(Boolean))];
+  if (groupsTouched.length && wmData) {
+    const leaders = [];
+    groupsTouched.forEach(g => {
+      const allInGroup = wmData.matches.filter(x => x.group === g);
+      const standings = computeStandings(allInGroup);
+      if (standings.length && standings[0].pl > 0) {
+        leaders.push(`${g.replace('Group','Gr.')}: <b>${germanTeam(standings[0].name)}</b> (${standings[0].pts} P.)`);
+      }
+    });
+    if (leaders.length) s += `Tabellenführer nach den gestrigen Spielen: ${leaders.join(' · ')}.`;
+  }
+  return s;
+}
+
+// ============================================================
+// TURNIERBAUM
+// ============================================================
+const ROUND_LABEL = {
+  'Round of 32': '🥅 Achtzehntelfinale',
+  'Round of 16': '🥈 Achtelfinale',
+  'Quarter-finals': '🥉 Viertelfinale',
+  'Semi-finals': '🏅 Halbfinale',
+  'Final': '🏆 Finale',
+  'Match for third place': '🥉 Spiel um Platz 3',
+  'Third-place play-off': '🥉 Spiel um Platz 3',
+};
+const ROUND_COUNT = {
+  'Round of 32': 16, 'Round of 16': 8, 'Quarter-finals': 4,
+  'Semi-finals': 2, 'Final': 1, 'Match for third place': 1, 'Third-place play-off': 1,
+};
+
+function isKnockoutRound(round) {
+  return round && /Round of|Quarter|Semi|Final|third/i.test(round);
+}
+
+function renderBracket() {
+  const el = document.getElementById('bracketContent');
+  if (!wmData || !wmData.matches) {
+    el.innerHTML = '<div class="wm-loading">Daten werden geladen … bitte gleich nochmal antippen.</div>';
+    return;
+  }
+  const koMatches = wmData.matches.filter(m => isKnockoutRound(m.round));
+  if (!koMatches.length) {
+    el.innerHTML = `<div class="info-box">
+      <div class="ttl">🌱 K.O.-PHASE STARTET AM 27.06.</div>
+      <p>Der Turnierbaum wird gefüllt, sobald die Gruppenphase abgeschlossen ist. Bis dahin schau im Tab <b>🏆 Tabelle</b> wie es in den 12 Gruppen läuft.</p>
+      <p style="margin-top:10px;">Erwarteter Ablauf:</p>
+      <ul style="margin-top:6px;padding-left:18px;">
+        <li><b>27.–30.06.</b> Achtzehntelfinale (R32) – 16 Spiele</li>
+        <li><b>02.–06.07.</b> Achtelfinale (R16) – 8 Spiele</li>
+        <li><b>09.–11.07.</b> Viertelfinale – 4 Spiele</li>
+        <li><b>14.–15.07.</b> Halbfinale – 2 Spiele</li>
+        <li><b>18.07.</b> Spiel um Platz 3</li>
+        <li><b>19.07.</b> Finale in East Rutherford (New York/NJ) 🏆</li>
+      </ul>
+    </div>`;
+    return;
+  }
+  const byRound = {};
+  koMatches.forEach(m => {
+    if (!byRound[m.round]) byRound[m.round] = [];
+    byRound[m.round].push(m);
+  });
+  const order = ['Round of 32','Round of 16','Quarter-finals','Semi-finals','Match for third place','Third-place play-off','Final'];
+  let html = '';
+  order.forEach(round => {
+    if (!byRound[round]) return;
+    const matches = byRound[round].sort((a,b) => (parseMatchTime(a)||0) - (parseMatchTime(b)||0));
+    const expected = ROUND_COUNT[round] || matches.length;
+    html += `<div class="bracket-round">
+      <div class="bracket-round-title">
+        <span>${ROUND_LABEL[round] || round}</span>
+        <span class="ct">${matches.length}/${expected} Spiele</span>
+      </div>
+      <div class="bracket-matches">
+        ${matches.map(m => bracketMatchHtml(m)).join('')}
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function bracketMatchHtml(m) {
+  const idx = wmData.matches.indexOf(m);
+  const status = matchStatus(m);
+  const isDeu = m.team1 === 'Germany' || m.team2 === 'Germany';
+  const isTBD = (t) => !t || /winner|loser|tbd|runner|^\d[A-Z]?$|placement/i.test(t);
+  const isTBD1 = isTBD(m.team1), isTBD2 = isTBD(m.team2);
+  let team1Class = 'bracket-team', team2Class = 'bracket-team';
+  if (isTBD1) team1Class += ' tbd';
+  if (isTBD2) team2Class += ' tbd';
+  let s1 = '', s2 = '';
+  if (status === 'finished') {
+    s1 = m.score.ft[0]; s2 = m.score.ft[1];
+    if (m.score.ft[0] > m.score.ft[1]) { team1Class += ' winner'; team2Class += ' loser'; }
+    else if (m.score.ft[1] > m.score.ft[0]) { team2Class += ' winner'; team1Class += ' loser'; }
+  } else if (status === 'live' && m.score?.ht) {
+    s1 = m.score.ht[0]; s2 = m.score.ht[1];
+  }
+  let meta = '';
+  if (m.date) {
+    const t = parseMatchTime(m);
+    if (t) meta = new Date(t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) +
+      ' · ' + new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    else meta = m.date;
+  }
+  if (m.ground) meta += (meta ? ' · ' : '') + m.ground;
+  return `<div class="bracket-match ${isDeu ? 'deu' : ''} ${status}" onclick="openMatchDetail(${idx})">
+    <div class="${team1Class}">
+      <span class="team-flag">${flagFor(m.team1)}</span>
+      <span class="team-name">${isTBD1 ? m.team1 : germanTeam(m.team1)}</span>
+      <span class="score">${s1}</span>
+    </div>
+    <div class="${team2Class}">
+      <span class="team-flag">${flagFor(m.team2)}</span>
+      <span class="team-name">${isTBD2 ? m.team2 : germanTeam(m.team2)}</span>
+      <span class="score">${s2}</span>
+    </div>
+    ${meta ? `<div class="bracket-match-meta">${meta}</div>` : ''}
+  </div>`;
+}
+window.renderBracket = renderBracket;
 
 // ============================================================
 // SCHÄTZEN
