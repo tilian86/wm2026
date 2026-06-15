@@ -1388,6 +1388,14 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
       <rect x="100" y="460" width="160" height="60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
       <rect x="140" y="500" width="80" height="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
 
+      <!-- Trainerbank am Spielfeldrand -->
+      <g class="coach-spot" data-coach="nagelsmann" transform="translate(20, 250)" style="cursor:pointer;">
+        <rect x="-14" y="-16" width="28" height="44" fill="#000" stroke="#FFCE00" stroke-width="2" rx="3"/>
+        <circle cx="0" cy="-4" r="7" fill="#FFCE00"/>
+        <text x="0" y="36" fill="#FFCE00" font-weight="800" font-size="9" text-anchor="middle">COACH</text>
+        <text x="0" y="46" fill="#fff" font-weight="600" font-size="7.5" text-anchor="middle">Nagelsmann</text>
+      </g>
+
       <!-- Position spots: 4-2-3-1 -->
       <!-- ST (Mittelstürmer) -->
       <g class="pos-spot att" data-pos="ST">
@@ -3342,7 +3350,19 @@ function posCatLabel(cat) {
 
 function renderLive() {
   const sorted = [...PLAYERS].sort((a,b) => a.nr - b.nr);
-  const html = sorted.map(p => {
+  // Coach-Karte zuerst, dann die Spieler
+  const coachCard = `
+    <div class="jersey" data-nr="0" data-name="nagelsmann julian trainer coach" data-cat="COACH" onclick="openCoachModal()">
+      <div class="jersey-bg placeholder" id="bg-coach" style="background:linear-gradient(135deg,#000,#333);color:#FFCE00;font-size:24px;">JN</div>
+      <div class="jersey-pos-tag" style="background:#FFCE00;color:#000;">COACH</div>
+      <div class="jersey-num" style="font-size:20px;">T</div>
+      <div class="jersey-name">
+        <span class="firstname">Julian</span>
+        <span class="surname">Nagelsmann</span>
+      </div>
+    </div>
+  `;
+  const html = coachCard + sorted.map(p => {
     const cat = posCategory(p);
     const parts = p.name.split(' ');
     const surname = parts.pop();
@@ -3360,6 +3380,19 @@ function renderLive() {
     `;
   }).join('');
   document.getElementById('jerseyGrid').innerHTML = html;
+  // Coach-Foto via Wikipedia
+  getPhoto(COACH.wiki).then(url => {
+    if (url) {
+      const bg = document.getElementById('bg-coach');
+      if (bg) {
+        bg.style.backgroundImage = `url("${url}")`;
+        bg.style.backgroundSize = 'cover';
+        bg.style.backgroundPosition = 'center 15%';
+        bg.classList.remove('placeholder');
+        bg.textContent = '';
+      }
+    }
+  });
 
   // Preload alle Bilder im Hintergrund
   sorted.forEach(async p => {
