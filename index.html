@@ -1368,6 +1368,62 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   text-align: center; font-weight: 900; font-size: 10px; line-height: 18px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
+/* Inline-Detail unter Globus */
+.globe-detail-card {
+  background: linear-gradient(135deg, rgba(255,23,68,0.12), var(--card));
+  border: 1px solid rgba(255,23,68,0.45);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 12px;
+  position: relative;
+  animation: slideDown 0.3s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.globe-detail-card .close {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.4); border: 0; color: var(--muted);
+  width: 28px; height: 28px; border-radius: 50%;
+  cursor: pointer; font-size: 14px; font-family: inherit;
+}
+.globe-detail-card .close:hover { color: var(--txt); }
+.globe-detail-card .top-line {
+  font-size: 10px; letter-spacing: 1.5px; font-weight: 800;
+  color: #FF1744; margin-bottom: 4px;
+}
+.globe-detail-card .teams {
+  font-size: 17px; font-weight: 800;
+  line-height: 1.2; margin-bottom: 8px; padding-right: 30px;
+}
+.globe-detail-card .meta-line {
+  font-size: 12px; color: var(--muted); margin-bottom: 8px;
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.globe-detail-card .meta-line span { display: inline-flex; align-items: center; gap: 4px; }
+.globe-detail-card .score {
+  font-size: 30px; font-weight: 900; color: var(--gold);
+  text-align: center; padding: 6px 0; line-height: 1;
+}
+.globe-detail-card .score.pending { font-size: 22px; color: var(--txt); }
+.globe-detail-card .score.live { color: #FF1744; animation: blinkBg 1.2s infinite; }
+.globe-detail-card .scorers {
+  font-size: 12px; color: var(--txt); line-height: 1.5;
+  margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--border);
+}
+.globe-detail-card .scorers .scr { color: var(--muted); margin-right: 4px; }
+.globe-detail-card .actions {
+  display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+}
+.globe-detail-card .actions a, .globe-detail-card .actions .speak-btn {
+  font-size: 12px; padding: 6px 12px;
+}
+.globe-detail-card .actions a {
+  background: rgba(255,206,0,0.12); border: 1px solid rgba(255,206,0,0.4);
+  color: var(--gold); text-decoration: none; border-radius: 999px;
+  font-weight: 600;
+}
 
 /* Match-Link in News */
 .match-link {
@@ -1555,6 +1611,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
     <div id="globeEl" style="width:100%;height:100%;"></div>
     <button id="globeReset" onclick="resetGlobeView()" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(0,0,0,0.6);border:1px solid var(--gold);color:var(--gold);padding:6px 12px;border-radius:999px;font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;">🌍 Übersicht</button>
   </div>
+  <div id="globeSelectedDetail" style="display:none;"></div>
   <div class="globe-filter" id="globeFilter" style="margin-top: 14px;">
     <button class="active" data-fl="upcoming">⏭ Bevorstehende</button>
     <button data-fl="today">📅 Heute</button>
@@ -3744,6 +3801,8 @@ async function renderGlobe() {
         updateGlobePoints();
         updateSelectedRing();
         renderGlobeList(d.city);
+        // Detail-Karte ausblenden bei Stadt-Pin (keine konkrete Spielauswahl)
+        if (typeof clearGlobeSelectedDetail === 'function') clearGlobeSelectedDetail();
       })
       .ringColor(d => d.color || '#DD0000')
       .ringAltitude(0.008)
@@ -3851,8 +3910,9 @@ function resetGlobeView() {
   updateSelectedRing();
   globeInstance.controls().autoRotate = true;
   globeInstance.pointOfView({ lat: 38, lng: -90, altitude: 1.8 }, 1500);
-  // Match-Liste zurück auf normalen Filter
+  // Match-Liste zurück auf normalen Filter, Detail-Karte zu
   renderGlobeList();
+  clearGlobeSelectedDetail();
 }
 window.resetGlobeView = resetGlobeView;
 
@@ -3871,8 +3931,75 @@ function zoomToMatch(matchIdx) {
   focusOnPin({ lat: info.lat, lng: info.lng });
   updateGlobePoints();
   updateSelectedRing();
+  renderGlobeSelectedDetail(matchIdx);
 }
 window.zoomToMatch = zoomToMatch;
+
+function renderGlobeSelectedDetail(matchIdx) {
+  const el = document.getElementById('globeSelectedDetail');
+  const m = wmData?.matches?.[matchIdx];
+  if (!m) { el.style.display = 'none'; return; }
+  const status = matchStatus(m);
+  const isDeu = m.team1 === 'Germany' || m.team2 === 'Germany';
+  const t = parseMatchTime(m);
+  const dateStr = t ? new Date(t).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }) : (m.date || '');
+  const timeStr = t ? new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr' : '';
+  const stadiumInfo = STADIUMS[m.ground];
+  const cityFlag = stadiumInfo ? stadiumInfo.country : '';
+  // Score
+  let scoreHtml = '';
+  if (status === 'finished') {
+    scoreHtml = `<div class="score">${m.score.ft[0]} : ${m.score.ft[1]}</div>`;
+  } else if (status === 'live') {
+    const ht = m.score?.ht;
+    scoreHtml = ht
+      ? `<div class="score live">${ht[0]} : ${ht[1]}<div style="font-size:10px;font-weight:600;margin-top:4px;letter-spacing:1px;">🔴 LIVE · HALBZEIT</div></div>`
+      : `<div class="score live">🔴 LIVE</div>`;
+  } else {
+    scoreHtml = `<div class="score pending">${timeStr || 'kommt noch'}</div>`;
+  }
+  // Scorers (kompakt)
+  let scorersHtml = '';
+  const goals1 = m.goals1 || [];
+  const goals2 = m.goals2 || [];
+  if (goals1.length || goals2.length) {
+    const allGoals = [
+      ...goals1.map(g => ({ ...g, side: m.team1 })),
+      ...goals2.map(g => ({ ...g, side: m.team2 })),
+    ].sort((a,b) => parseInt(a.minute) - parseInt(b.minute));
+    scorersHtml = `<div class="scorers">⚽ ${allGoals.map(g => `<span class="scr">${g.minute}'</span>${g.name} (${flagFor(g.side)})`).join(' · ')}</div>`;
+  }
+  // Vorlesen-Text
+  const speakText = status === 'finished'
+    ? `Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} endete ${m.score.ft[0]} zu ${m.score.ft[1]}. ${(m.goals1||[]).map(g => g.name + ' für ' + germanTeam(m.team1) + ' in Minute ' + g.minute).join('. ')} ${(m.goals2||[]).map(g => g.name + ' für ' + germanTeam(m.team2) + ' in Minute ' + g.minute).join('. ')}`.trim()
+    : `${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} am ${dateStr} um ${timeStr} im ${m.ground || ''}.`;
+  // Build card
+  el.innerHTML = `
+    <div class="globe-detail-card">
+      <button class="close" onclick="clearGlobeSelectedDetail()">✕</button>
+      <div class="top-line">${isDeu ? '⭐ DFB-SPIEL' : 'AUSGEWÄHLTES SPIEL'}</div>
+      <div class="teams">${flagFor(m.team1)} ${germanTeam(m.team1)} – ${germanTeam(m.team2)} ${flagFor(m.team2)}</div>
+      <div class="meta-line">
+        <span>📅 ${dateStr}${timeStr ? ' · ' + timeStr : ''}</span>
+        <span>📍 ${cityFlag} ${m.ground || '?'}</span>
+        <span>${m.group ? '🏆 ' + m.group.replace('Group','Gruppe') : (m.round || '')}</span>
+      </div>
+      ${scoreHtml}
+      ${scorersHtml}
+      <div class="actions">
+        ${speakBtn(speakText, status === 'finished' ? 'Bericht vorlesen' : 'Spiel vorlesen')}
+        <a href="${matchReportLink(m)}" target="_blank" rel="noopener">📰 Bericht bei Google</a>
+      </div>
+    </div>
+  `;
+  el.style.display = 'block';
+}
+window.renderGlobeSelectedDetail = renderGlobeSelectedDetail;
+
+function clearGlobeSelectedDetail() {
+  document.getElementById('globeSelectedDetail').style.display = 'none';
+}
+window.clearGlobeSelectedDetail = clearGlobeSelectedDetail;
 
 function renderGlobeList(cityFilter) {
   if (!wmData || !wmData.matches) return;
@@ -3912,7 +4039,7 @@ function renderGlobeList(cityFilter) {
     if (status === 'finished') badge = `<span class="badge-mini done">${m.score.ft[0]}:${m.score.ft[1]}</span>`;
     else if (status === 'live') badge = `<span class="badge-mini live">🔴 LIVE</span>`;
     else badge = `<span class="badge-mini">${m.group ? m.group.replace('Group','Gr.') : (m.round || '')}</span>`;
-    return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="zoomToMatch(${idx}); openMatchDetail(${idx})">
+    return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="zoomToMatch(${idx})">
       <div class="when">
         <div class="dy">${day}</div>
         <div class="mo">${mo}</div>
