@@ -1329,11 +1329,10 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 .pyr-group .gname { font-weight: 800; color: var(--gold); font-size: 12px; margin-bottom: 2px; }
 .pyramid-hint { text-align: center; color: var(--muted); font-size: 11px; margin-top: 10px; line-height: 1.4; }
 
-/* Auf größeren Bildschirmen: klassische Pyramide mit fixer Breite */
+/* Auf größeren Bildschirmen: Karten dürfen wachsen, brechen aber bei Bedarf um */
 @media (min-width: 760px) {
-  .pyr-row-inner { flex-wrap: nowrap; }
-  .pyr-card { flex: 0 0 auto; min-width: 110px; max-width: 140px; }
-  .pyr-groups { grid-template-columns: repeat(12, 1fr); }
+  .pyr-card { flex: 0 1 auto; min-width: 120px; max-width: 160px; }
+  .pyr-groups { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
 }
 
 /* GLOBE TAB - Match-Globus */
