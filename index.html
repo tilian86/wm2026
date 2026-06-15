@@ -766,13 +766,18 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
   background: var(--card-2);
   border-radius: 10px;
   padding: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.tipp-match-tabs::-webkit-scrollbar { display: none; }
 .tipp-match-tabs button {
-  flex: 1;
+  flex: 1 0 auto;
+  min-width: 80px;
   background: transparent;
   border: 0;
   color: var(--muted);
-  padding: 8px 4px;
+  padding: 8px 6px;
   border-radius: 7px;
   font-size: 11px;
   font-weight: 700;
@@ -1618,7 +1623,7 @@ h2 { font-size: 20px; margin-bottom: 6px; letter-spacing: -0.3px; }
 <!-- BRACKET VIEW -->
 <div class="view" id="bracket">
   <h2>🥅 Turnierbaum</h2>
-  <p class="lead">Bottom-Up: unten die Gruppen, oben das Finale. Bei mobilen Geräten seitlich scrollen.</p>
+  <p class="lead">Bottom-Up: unten die Gruppen, oben das Finale. Tippe auf ein Spiel für Details.</p>
   <div id="bracketContent"><div class="wm-loading">Lade Turnierbaum …</div></div>
 </div>
 
@@ -3467,7 +3472,11 @@ function openMatchDetail(matchIdx) {
   } else if (status === 'live') {
     scoreHtml = `<div class="big-score">${m.score?.ht?.[0] ?? '–'} : ${m.score?.ht?.[1] ?? '–'}</div><div class="meta">LIVE</div>`;
   } else {
-    scoreHtml = `<div class="big-score" style="font-size:24px;">${fmtMatchTimeLocal(m).split(' · ')[1] || ''}</div><div class="meta">${fmtMatchTimeLocal(m).split(' · ')[0]} · noch nicht angepfiffen</div>`;
+    const fmt = fmtMatchTimeLocal(m) || '';
+    const parts = fmt.split(' · ');
+    const dateStr = parts[0] || m.date || '';
+    const timeStr = parts[1] || '';
+    scoreHtml = `<div class="big-score" style="font-size:24px;">${timeStr || 'kommt noch'}</div><div class="meta">${dateStr} · noch nicht angepfiffen</div>`;
   }
   let goalsHtml = '';
   if (m.goals1 && m.goals1.length) {
@@ -3710,7 +3719,7 @@ function renderBracket() {
   </div>`;
 
   html += '</div>';
-  html += '<div class="pyramid-hint">📱 Auf dem Handy seitlich scrollen für die längeren Runden</div>';
+  html += '<div class="pyramid-hint">⭐ Gelb umrandet = Deutschland · 🔴 Roter Rand = LIVE · Klick auf eine Karte für Details</div>';
   el.innerHTML = html;
 }
 
@@ -3976,19 +3985,21 @@ window.resetGlobeView = resetGlobeView;
 
 function zoomToMatch(matchIdx) {
   const m = wmData?.matches?.[matchIdx];
-  if (!m || !m.ground) return;
-  const info = STADIUMS[m.ground];
-  if (!info) return;
-  selectedCity = m.ground;
+  if (!m) return;
+  const info = m.ground ? STADIUMS[m.ground] : null;
   selectedMatchIdx = matchIdx;
   // Auf Handy: Globus nach oben scrollen, damit man die Rotation auch sieht
   const globeBox = document.getElementById('globeMap');
   if (globeBox) {
     globeBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-  focusOnPin({ lat: info.lat, lng: info.lng });
-  updateGlobePoints();
-  updateSelectedRing();
+  if (info) {
+    selectedCity = m.ground;
+    focusOnPin({ lat: info.lat, lng: info.lng });
+    updateGlobePoints();
+    updateSelectedRing();
+  }
+  // Detail-Karte immer zeigen, auch wenn Stadion (noch) nicht ausgelost
   renderGlobeSelectedDetail(matchIdx);
 }
 window.zoomToMatch = zoomToMatch;
