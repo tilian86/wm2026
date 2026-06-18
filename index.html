@@ -58,19 +58,30 @@ body { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
 
 /* TABS */
 .tabs {
-  display: flex; gap: 4px; margin-top: 14px;
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px;
+  justify-content: flex-start;
 }
-.tabs::-webkit-scrollbar { display: none; }
 .tab {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   background: var(--card); border: 1px solid var(--border); color: var(--muted);
-  padding: 8px 14px; border-radius: 999px; font-size: 13px;
+  padding: 7px 11px; border-radius: 999px; font-size: 12px;
   font-weight: 600; cursor: pointer; white-space: nowrap;
   font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
+.tab:active { transform: scale(0.95); }
 .tab.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+/* Auf sehr schmalen Handys noch etwas kompakter */
+@media (max-width: 400px) {
+  .tab { padding: 6px 9px; font-size: 11px; gap: 3px; }
+}
+
+/* Auf Desktop wieder größer, aber weiterhin umbrechend (passt meist in 1-2 Zeilen) */
+@media (min-width: 720px) {
+  .tabs { gap: 6px; }
+  .tab { padding: 8px 14px; font-size: 13px; }
+}
 
 .content { padding: 20px 16px; max-width: 720px; margin: 0 auto; }
 .view { display: none; animation: fadeIn 0.3s ease; }
