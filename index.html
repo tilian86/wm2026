@@ -3306,10 +3306,9 @@ async function loadWMData(forceRefresh = false) {
   let lastErr = null;
   for (const url of sources) {
     try {
-      const r = await fetch(url, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
-      });
+      // KEINE Custom-Headers (würden CORS-Preflight triggern und GitHub würde 403 zurückgeben).
+      // cache: 'no-store' + Timestamp-Query reichen für frische Daten.
+      const r = await fetch(url, { cache: 'no-store' });
       if (!r.ok) { lastErr = new Error("HTTP " + r.status); continue; }
       wmData = await r.json();
       wmLastLoad = now;
