@@ -2986,7 +2986,7 @@ function generateAutoNews() {
       const reportLink = matchReportLink(m);
       let line = `${time} Uhr — ${flagFor(m.team1)} ${germanTeam(m.team1)} vs. ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
       if (status === 'finished') {
-        line += ` <b>(${m.score.ft[0]}:${m.score.ft[1]})</b>`;
+        line += ` <b>(${matchScoreString(m)})</b>`;
       } else if (status === 'live') {
         const ht = m.score?.ht;
         line += ht ? ` 🔴 LIVE (${ht[0]}:${ht[1]} HZ)` : ' 🔴 LIVE';
@@ -3007,7 +3007,7 @@ function generateAutoNews() {
     yesterdayMatches.forEach(m => {
       const isDFB = m.team1 === 'Germany' || m.team2 === 'Germany';
       const reportLink = matchReportLink(m);
-      let line = `${flagFor(m.team1)} ${germanTeam(m.team1)} <b>${m.score.ft[0]}:${m.score.ft[1]}</b> ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
+      let line = `${flagFor(m.team1)} ${germanTeam(m.team1)} <b>${matchScoreString(m)}</b> ${germanTeam(m.team2)} ${flagFor(m.team2)}`;
       if (m.group) line += ` <span style="color:var(--muted);">· ${m.group.replace('Group','Gr.')}</span>`;
       line += ` <a class="match-link" href="${reportLink}" target="_blank" rel="noopener">Bericht ↗</a>`;
       if (isDFB) line = `<b style="color:var(--gold);">⭐ ${line}</b>`;
@@ -3037,16 +3037,37 @@ function generateAutoNews() {
       const opponent = isHome ? m.team2 : m.team1;
       const oppDe = germanTeam(opponent);
       const oppFlag = flagFor(opponent);
-      const [g1, g2] = m.score.ft;
+      const fs = matchFinalScore(m) || { s1: 0, s2: 0, winner: 0, suffix: '' };
+      const [g1, g2] = [fs.s1, fs.s2];
       const dfbGoals = isHome ? g1 : g2;
       const oppGoals = isHome ? g2 : g1;
-      const result = dfbGoals > oppGoals ? 'gewinnt' : dfbGoals < oppGoals ? 'verliert' : 'spielt unentschieden';
-      const emoji = dfbGoals > oppGoals ? '🎉' : dfbGoals < oppGoals ? '😞' : '🤝';
+      // Sieger nach n.E./n.V./n.S. berücksichtigen
+      const dfbWonRaw = (fs.winner === 1 && isHome) || (fs.winner === 2 && !isHome);
+      const dfbLostRaw = (fs.winner === 2 && isHome) || (fs.winner === 1 && !isHome);
+      const isPen = fs.suffix === 'n.E.';
+      const isEt = fs.suffix === 'n.V.';
+      const result = dfbWonRaw
+        ? (isPen ? 'gewinnt im Elfmeterschießen' : isEt ? 'gewinnt nach Verlängerung' : 'gewinnt')
+        : dfbLostRaw
+          ? (isPen ? 'verliert im Elfmeterschießen' : isEt ? 'verliert nach Verlängerung' : 'verliert')
+          : 'spielt unentschieden';
+      const emoji = dfbWonRaw ? '🎉' : dfbLostRaw ? '😞' : '🤝';
       const dateStr = new Date(parseMatchTime(m)).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
       const scorers1 = (m.goals1 || []).map(g => `${g.name} (${g.minute}.)`).join(', ');
       const scorers2 = (m.goals2 || []).map(g => `${g.name} (${g.minute}.)`).join(', ');
-      let body = `<p><b>${emoji} Endstand: ${dfbGoals}:${oppGoals}</b> ${isHome ? '' : '(aus deutscher Sicht)'} </p>`;
-      body += `<p>Deutschland ${result} im ${m.group ? 'Gruppen-' : ''}Spiel gegen ${oppDe} ${oppFlag} im Stadion in ${m.ground || '?'}.</p>`;
+      const scoreLabel = matchScoreString(m); // z.B. "1:1 n.E. (3:4)"
+      let body = `<p><b>${emoji} Endstand: ${scoreLabel}</b> ${isHome ? '' : '(aus deutscher Sicht)'} </p>`;
+      body += `<p>Deutschland ${result} im ${m.group ? 'Gruppen-' : 'K.o.-'}Spiel gegen ${oppDe} ${oppFlag} im Stadion in ${m.ground || '?'}.</p>`;
+      if (isPen) {
+        const dfbP = isHome ? fs.p1 : fs.p2;
+        const oppP = isHome ? fs.p2 : fs.p1;
+        body += `<p>⚽ <b>Elfmeterschießen: Deutschland ${dfbP} : ${oppP} ${oppDe}</b></p>`;
+        if (dfbLostRaw) {
+          body += `<p>Damit ist Deutschland aus dem Turnier ausgeschieden.</p>`;
+        }
+      } else if (isEt && dfbLostRaw && !m.group) {
+        body += `<p>Damit ist Deutschland aus dem Turnier ausgeschieden.</p>`;
+      }
       if (scorers1 || scorers2) {
         body += `<p><b>Torschützen:</b></p><ul>`;
         if (isHome && scorers1) body += `<li>🇩🇪 ${scorers1}</li>`;
@@ -3057,8 +3078,8 @@ function generateAutoNews() {
       }
       out.push({
         type: 'post',
-        badge: `SPIELBERICHT ${dfbGoals}:${oppGoals}`,
-        title: `${emoji} Deutschland ${result} ${dfbGoals}:${oppGoals} gegen ${oppDe}`,
+        badge: `SPIELBERICHT ${scoreLabel}`,
+        title: `${emoji} Deutschland ${result} ${scoreLabel} gegen ${oppDe}`,
         date: dateStr,
         body,
       });
@@ -3367,6 +3388,39 @@ function matchStatus(m) {
   return 'pending';
 }
 
+// Liefert den tatsächlichen Endstand inkl. Verlängerung/Elfmeterschießen
+// Rückgabe: { s1, s2, p1?, p2?, et?, suffix, winner: 1|2|0 }
+function matchFinalScore(m) {
+  if (!m.score) return null;
+  const ft = m.score.ft;
+  if (m.score.p && m.score.p.length === 2) {
+    return {
+      s1: ft?.[0] ?? 0, s2: ft?.[1] ?? 0,
+      p1: m.score.p[0], p2: m.score.p[1],
+      et: m.score.et, suffix: 'n.E.',
+      winner: m.score.p[0] > m.score.p[1] ? 1 : 2,
+    };
+  }
+  if (m.score.et && m.score.et.length === 2) {
+    const w = m.score.et[0] > m.score.et[1] ? 1 : (m.score.et[1] > m.score.et[0] ? 2 : 0);
+    return { s1: m.score.et[0], s2: m.score.et[1], et: m.score.et, ft, suffix: 'n.V.', winner: w };
+  }
+  if (ft && ft.length === 2) {
+    const w = ft[0] > ft[1] ? 1 : (ft[1] > ft[0] ? 2 : 0);
+    return { s1: ft[0], s2: ft[1], suffix: '', winner: w };
+  }
+  return null;
+}
+
+// Kompakter Score-String: "1:1 n.E. (3:4)" / "1:1 n.V." / "2:1"
+function matchScoreString(m) {
+  const r = matchFinalScore(m);
+  if (!r) return '';
+  if (r.suffix === 'n.E.') return `${r.s1}:${r.s2} n.E. (${r.p1}:${r.p2})`;
+  if (r.suffix === 'n.V.') return `${r.s1}:${r.s2} n.V.`;
+  return `${r.s1}:${r.s2}`;
+}
+
 function parseMatchTime(m) {
   // openfootball: date "2026-06-14", time "13:00 UTC-6" or similar
   if (!m.date || !m.time) return null;
@@ -3455,7 +3509,7 @@ function renderWMGroups() {
           const status = matchStatus(m);
           let scoreText;
           if (status === 'finished') {
-            scoreText = `${m.score.ft[0]} : ${m.score.ft[1]}`;
+            scoreText = matchScoreString(m).replace(':', ' : ');
           } else if (status === 'live') {
             const cur = m.score && m.score.ht ? `${m.score.ht[0]}:${m.score.ht[1]} HZ` : 'LIVE';
             scoreText = cur;
@@ -3505,8 +3559,16 @@ function openMatchDetail(matchIdx) {
   const status = matchStatus(m);
   let scoreHtml;
   if (status === 'finished') {
+    const fs = matchFinalScore(m);
     scoreHtml = `<div class="big-score">${m.score.ft[0]} : ${m.score.ft[1]}</div>`;
-    if (m.score.ht) scoreHtml += `<div class="meta">Halbzeit ${m.score.ht[0]}:${m.score.ht[1]}</div>`;
+    const metaParts = [];
+    if (m.score.ht) metaParts.push(`Halbzeit ${m.score.ht[0]}:${m.score.ht[1]}`);
+    if (fs && fs.suffix === 'n.V.') metaParts.unshift(`Endstand n.V.: ${fs.s1}:${fs.s2}`);
+    if (fs && fs.suffix === 'n.E.') {
+      metaParts.unshift(`Verlängerung: ${fs.s1}:${fs.s2}`);
+      metaParts.unshift(`<b style="color:var(--gold);font-size:15px;">⚽ Elfmeterschießen: ${fs.p1} : ${fs.p2}</b>`);
+    }
+    if (metaParts.length) scoreHtml += `<div class="meta">${metaParts.join(' · ')}</div>`;
   } else if (status === 'live') {
     scoreHtml = `<div class="big-score">${m.score?.ht?.[0] ?? '–'} : ${m.score?.ht?.[1] ?? '–'}</div><div class="meta">LIVE</div>`;
   } else {
@@ -3532,7 +3594,7 @@ function openMatchDetail(matchIdx) {
         <div class="meta">${m.ground || ''} · ${m.group || m.round || ''}</div>
       </div>
       ${goalsHtml || '<div style="text-align:center;color:var(--muted);font-size:13px;padding:14px;">Noch keine Torschützen-Daten</div>'}
-      ${status === 'finished' ? `<div class="news-actions" style="margin-top:14px;">${speakBtn(`Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} endete ${m.score.ft[0]} zu ${m.score.ft[1]}. ${(m.goals1||[]).map(g=>g.name+' für '+germanTeam(m.team1)+' in Minute '+g.minute).join('. ')}. ${(m.goals2||[]).map(g=>g.name+' für '+germanTeam(m.team2)+' in Minute '+g.minute).join('. ')}.`, 'Bericht vorlesen')}</div>` : ''}
+      ${status === 'finished' ? `<div class="news-actions" style="margin-top:14px;">${speakBtn((function(){const fs=matchFinalScore(m);let e;if(fs?.suffix==='n.E.'){const w=fs.winner===1?germanTeam(m.team1):germanTeam(m.team2);e=`endete nach Verlängerung ${m.score.ft[0]} zu ${m.score.ft[1]}. Im Elfmeterschießen gewann ${w} mit ${fs.p1} zu ${fs.p2}.`;}else if(fs?.suffix==='n.V.'){e=`endete nach Verlängerung ${fs.s1} zu ${fs.s2}.`;}else{e=`endete ${m.score.ft[0]} zu ${m.score.ft[1]}.`;}return `Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} ${e} ${(m.goals1||[]).map(g=>g.name+' für '+germanTeam(m.team1)+' in Minute '+g.minute).join('. ')}. ${(m.goals2||[]).map(g=>g.name+' für '+germanTeam(m.team2)+' in Minute '+g.minute).join('. ')}.`;})(), 'Bericht vorlesen')}</div>` : ''}
     </div>
   `;
   openModal('modalPlayer');
@@ -3788,17 +3850,24 @@ function pyrCardHtml(m, isFinal) {
   let c1 = 'pt', c2 = 'pt';
   if (tbd1) c1 += ' tbd';
   if (tbd2) c2 += ' tbd';
-  let s1 = '', s2 = '';
+  let s1 = '', s2 = '', suffix = '';
   if (status === 'finished') {
+    const fs = matchFinalScore(m);
     s1 = m.score.ft[0]; s2 = m.score.ft[1];
-    if (s1 > s2) { c1 += ' winner'; c2 += ' loser'; }
-    else if (s2 > s1) { c2 += ' winner'; c1 += ' loser'; }
+    if (fs) {
+      if (fs.winner === 1) { c1 += ' winner'; c2 += ' loser'; }
+      else if (fs.winner === 2) { c2 += ' winner'; c1 += ' loser'; }
+      if (fs.suffix === 'n.E.') suffix = `n.E. ${fs.p1}:${fs.p2}`;
+      else if (fs.suffix === 'n.V.') suffix = 'n.V.';
+    }
   } else if (status === 'live' && m.score?.ht) {
     s1 = m.score.ht[0]; s2 = m.score.ht[1];
   }
+  const suffixHtml = suffix ? `<div style="font-size:9px; color:var(--gold); text-align:center; margin-top:2px; letter-spacing:0.5px;">${suffix}</div>` : '';
   return `<div class="pyr-card ${isFinal ? 'final-card' : ''} ${isDeu ? 'deu' : ''} ${status}" onclick="openMatchDetail(${idx})">
     <div class="${c1}"><span class="fl">${flagFor(m.team1)}</span><span class="nm">${tbd1 ? m.team1 : germanTeam(m.team1)}</span>${s1 !== '' ? `<span class="sc">${s1}</span>` : ''}</div>
     <div class="${c2}"><span class="fl">${flagFor(m.team2)}</span><span class="nm">${tbd2 ? m.team2 : germanTeam(m.team2)}</span>${s2 !== '' ? `<span class="sc">${s2}</span>` : ''}</div>
+    ${suffixHtml}
   </div>`;
 }
 
@@ -4053,10 +4122,14 @@ function renderGlobeSelectedDetail(matchIdx) {
   const timeStr = t ? new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr' : '';
   const stadiumInfo = STADIUMS[m.ground];
   const cityFlag = stadiumInfo ? stadiumInfo.country : '';
-  // Score
+  // Score (mit n.V. / Elfmeterschießen)
   let scoreHtml = '';
   if (status === 'finished') {
-    scoreHtml = `<div class="score">${m.score.ft[0]} : ${m.score.ft[1]}</div>`;
+    const fs = matchFinalScore(m);
+    let extra = '';
+    if (fs && fs.suffix === 'n.V.') extra = `<div style="font-size:11px;font-weight:600;margin-top:4px;color:var(--muted);letter-spacing:0.5px;">nach Verlängerung</div>`;
+    if (fs && fs.suffix === 'n.E.') extra = `<div style="font-size:13px;font-weight:800;margin-top:4px;color:var(--gold);letter-spacing:0.5px;">⚽ Elfmeterschießen: ${fs.p1} : ${fs.p2}</div>`;
+    scoreHtml = `<div class="score">${m.score.ft[0]} : ${m.score.ft[1]}${extra}</div>`;
   } else if (status === 'live') {
     const ht = m.score?.ht;
     scoreHtml = ht
@@ -4077,9 +4150,22 @@ function renderGlobeSelectedDetail(matchIdx) {
     scorersHtml = `<div class="scorers">⚽ ${allGoals.map(g => `<span class="scr">${g.minute}'</span>${g.name} (${flagFor(g.side)})`).join(' · ')}</div>`;
   }
   // Vorlesen-Text
-  const speakText = status === 'finished'
-    ? `Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} endete ${m.score.ft[0]} zu ${m.score.ft[1]}. ${(m.goals1||[]).map(g => g.name + ' für ' + germanTeam(m.team1) + ' in Minute ' + g.minute).join('. ')} ${(m.goals2||[]).map(g => g.name + ' für ' + germanTeam(m.team2) + ' in Minute ' + g.minute).join('. ')}`.trim()
-    : `${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} am ${dateStr} um ${timeStr} im ${m.ground || ''}.`;
+  let speakText;
+  if (status === 'finished') {
+    const fs = matchFinalScore(m);
+    let endStr;
+    if (fs?.suffix === 'n.E.') {
+      const sieger = fs.winner === 1 ? germanTeam(m.team1) : germanTeam(m.team2);
+      endStr = `endete nach Verlängerung ${m.score.ft[0]} zu ${m.score.ft[1]}. Im Elfmeterschießen gewann ${sieger} mit ${fs.p1} zu ${fs.p2}.`;
+    } else if (fs?.suffix === 'n.V.') {
+      endStr = `endete nach Verlängerung ${fs.s1} zu ${fs.s2}.`;
+    } else {
+      endStr = `endete ${m.score.ft[0]} zu ${m.score.ft[1]}.`;
+    }
+    speakText = `Spielbericht: ${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} ${endStr} ${(m.goals1||[]).map(g => g.name + ' für ' + germanTeam(m.team1) + ' in Minute ' + g.minute).join('. ')} ${(m.goals2||[]).map(g => g.name + ' für ' + germanTeam(m.team2) + ' in Minute ' + g.minute).join('. ')}`.trim();
+  } else {
+    speakText = `${germanTeam(m.team1)} gegen ${germanTeam(m.team2)} am ${dateStr} um ${timeStr} im ${m.ground || ''}.`;
+  }
   // Build card
   el.innerHTML = `
     <div class="globe-detail-card">
@@ -4143,7 +4229,7 @@ function renderGlobeList(cityFilter) {
     const idx = wmData.matches.indexOf(m);
     const stadium = STADIUMS[m.ground] ? `${STADIUMS[m.ground].country} ${m.ground}` : (m.ground || '?');
     let badge = '';
-    if (status === 'finished') badge = `<span class="badge-mini done">${m.score.ft[0]}:${m.score.ft[1]}</span>`;
+    if (status === 'finished') badge = `<span class="badge-mini done">${matchScoreString(m)}</span>`;
     else if (status === 'live') badge = `<span class="badge-mini live">🔴 LIVE</span>`;
     else badge = `<span class="badge-mini">${m.group ? m.group.replace('Group','Gr.') : (m.round || '')}</span>`;
     return `<div class="match-row ${isDeu?'deu':''} ${status}" onclick="zoomToMatch(${idx})">
